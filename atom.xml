@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
+<<<<<<< HEAD
   <title><![CDATA[Object Craftworks]]></title>
   <link href="http://objectcraftworks.github.io/atom.xml" rel="self"/>
   <link href="http://objectcraftworks.github.io/"/>
@@ -8,6 +9,15 @@
   <id>http://objectcraftworks.github.io/</id>
   <author>
     <name><![CDATA[ObjectCraftworks.com]]></name>
+=======
+  <title><![CDATA[My Octopress Blog]]></title>
+  <link href="http://objectcraftworks.github.io/atom.xml" rel="self"/>
+  <link href="http://objectcraftworks.github.io/"/>
+  <updated>2013-07-07T20:50:22-04:00</updated>
+  <id>http://objectcraftworks.github.io/</id>
+  <author>
+    <name><![CDATA[Your Name]]></name>
+>>>>>>> 108f708a98651ea5e168a046d8cc6a053746494d
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
