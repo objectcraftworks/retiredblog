@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "index"
-date: 2013-07-07 23:01
+title: "tutorials"
+date: 2013-07-07 22:35
 comments: true
 sharing: true
 footer: true
