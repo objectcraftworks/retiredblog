@@ -33,17 +33,20 @@ and download it, and install it or unzip it, and copy the necessary assemblies t
 #### Install a package using Nuget Dialog
 
 
-  1. Right click on the project in the solution explorer, and then
-click on **Manage NuGet Packages** on the menu
-{% img /images/tutorials/nuget/open_nuget_dialog.png Open Nuget Dialog %} 
+1. Right click on the project in the solution explorer, and then
+   click on **Manage NuGet Packages** on the menu
+   {% img /images/tutorials/nuget/open_nuget_dialog.png Open Nuget Dialog %} 
 
 
 2. It opens the Nuget dialog 
-
-{% img /images/tutorials/nuget/nuget_dialog.png Nuget Dialog %} 
-
+   {% img /images/tutorials/nuget/nuget_dialog.png Nuget Dialog %} 
 
 
+3. Search for a package. Type jQuery in search box, and hit enter. 
+   {% img /images/tutorials/nuget/search_package.png Nuget Dialog %} 
 
- 
+4. You should see search results in the dialog. Select jQuery package, and click on install.
 
+   {% img /images/tutorials/nuget/install_package.png Install using Nuget Dialog %} 
+
+5. 
