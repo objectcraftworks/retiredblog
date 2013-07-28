@@ -4,7 +4,7 @@
   <title><![CDATA[Object Craftworks]]></title>
   <link href="http://objectcraftworks.github.io/atom.xml" rel="self"/>
   <link href="http://objectcraftworks.github.io/"/>
-  <updated>2013-07-07T21:51:50-04:00</updated>
+  <updated>2013-07-28T17:06:59-04:00</updated>
   <id>http://objectcraftworks.github.io/</id>
   <author>
     <name><![CDATA[ObjectCraftworks.com]]></name>
@@ -12,5 +12,843 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ASP.NET/MVC Exception Handling Part 4: ViewDataProvider for Error View]]></title>
+    <link href="http://objectcraftworks.github.io/blog/2013/07/24/asp-dot-net-mvc-viewdata-provider-for-error-view/"/>
+    <updated>2013-07-24T16:07:00-04:00</updated>
+    <id>http://objectcraftworks.github.io/blog/2013/07/24/asp-dot-net-mvc-viewdata-provider-for-error-view</id>
+    <content type="html"><![CDATA[<p> As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View.  We have seen in <a href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling">part2</a> and <a href="http://objectcraftworks.github.io/blog/2013/07/23/custom-model-for-errorview">part3</a>, how we can extend default exception filter to keep the viewdata items set by controller and to use custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use ideas from previous parts.</p>
+
+<p> <!-- more --></p>
+
+<p>  The MVC framework keeps the model in a dictionary called ViewDataDictionary.
+You can add view specific data as items to the dictionary.
+You can either directly access this items as you would in a dictionary, or use ViewBag, a dynamic object, which gives the items in the dictionary as properties.</p>
+
+<p>  ViewData items and its model property actually constitutes ViewData/ViewModel for the view.  So instead of justi having custom model &amp; model provider, we will extend the default filter to take ViewDataProvider. This will allow to extend not only for the model but also the view data items if any needed.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">  [HandleErrorWithCustomViewData(View=&quot;ErrorWithCustomModel&quot;, ViewDataProvider=typeof(ErrorViewDataProvider))]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  Now we need define a contract for ViewDataProvider.
+As Filter has two items it can pass to this model provider: ErrorContext, and the default model it creates. Let&rsquo;s define the signature</p>
+
+<figure class='code'><figcaption><span>contract </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">interface</span> <span class="n">IErrorViewDataProvider</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">ViewDataDictionary</span> <span class="nf">GetViewData</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">,</span> <span class="n">HandleErrorInfo</span> <span class="n">defaultModel</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can implement it as shown below. This particular implementation uses a custom model, and adds the view data items from the controller.</p>
+
+<figure class='code'><figcaption><span>implementation </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">ErrorViewDataProvider</span> <span class="p">:</span> <span class="n">IErrorViewDataProvider</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">public</span> <span class="n">ViewDataDictionary</span> <span class="nf">GetViewData</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">,</span> <span class="n">HandleErrorInfo</span> <span class="n">defaultModel</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="kt">var</span> <span class="n">model</span> <span class="p">=</span> <span class="n">GetModel</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">defaultModel</span><span class="p">);</span>
+</span><span class='line'>            <span class="kt">var</span> <span class="n">viewData</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ViewDataDictionary</span><span class="p">(</span><span class="n">model</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">AddControllerViewDataItemsToView</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">Controller</span><span class="p">.</span><span class="n">ViewData</span><span class="p">,</span> <span class="n">viewData</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">viewData</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">private</span> <span class="k">void</span> <span class="nf">AddControllerViewDataItemsToView</span><span class="p">(</span><span class="n">ViewDataDictionary</span> <span class="n">controllerViewData</span><span class="p">,</span> <span class="n">ViewDataDictionary</span> <span class="n">viewViewData</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="kt">var</span> <span class="n">itemsToAdd</span> <span class="p">=</span> <span class="n">controllerViewData</span>
+</span><span class='line'>                                            <span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">item</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">viewViewData</span><span class="p">.</span><span class="n">ContainsKey</span><span class="p">(</span><span class="n">item</span><span class="p">.</span><span class="n">Key</span><span class="p">));</span>
+</span><span class='line'>            <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">item</span> <span class="k">in</span> <span class="n">itemsToAdd</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>                <span class="n">viewViewData</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">item</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kt">object</span> <span class="nf">GetModel</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">,</span> <span class="n">HandleErrorInfo</span> <span class="n">defaultModel</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="k">new</span> <span class="n">CustomModel</span>
+</span><span class='line'>                <span class="p">{</span>
+</span><span class='line'>                    <span class="n">Exception</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">Exception</span><span class="p">,</span>
+</span><span class='line'>                    <span class="n">SupportInfo</span> <span class="p">=</span> <span class="n">GetSupportInfo</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>                <span class="p">};</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">SupportInfo</span> <span class="nf">GetSupportInfo</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">//You can load it from external source using the available context</span>
+</span><span class='line'>            <span class="k">return</span> <span class="k">new</span> <span class="n">SupportInfo</span>
+</span><span class='line'>                <span class="p">{</span>
+</span><span class='line'>                    <span class="n">ContactNo</span> <span class="p">=</span> <span class="s">&quot;1800Support&quot;</span>
+</span><span class='line'>                <span class="p">};</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Now that we have custom model, let&rsquo;s extend the default filter to use this model.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na"> [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">class</span> <span class="nc">HandleErrorWithCustomViewDataAttribute</span> <span class="p">:</span> <span class="n">HandleErrorAttribute</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">public</span> <span class="n">Type</span> <span class="n">ViewDataProvider</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnException</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">filterContext</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">filterContext</span><span class="p">.</span><span class="n">ExceptionHandled</span> <span class="p">==</span> <span class="k">true</span><span class="p">)</span>
+</span><span class='line'>                <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">base</span><span class="p">.</span><span class="n">OnException</span><span class="p">(</span><span class="n">filterContext</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">filterContext</span><span class="p">.</span><span class="n">ExceptionHandled</span> <span class="p">==</span> <span class="k">false</span><span class="p">)</span>
+</span><span class='line'>                <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Result</span> <span class="k">as</span> <span class="n">ViewResult</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span>
+</span><span class='line'>                <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>            <span class="kt">var</span> <span class="n">modelProvider</span> <span class="p">=</span> <span class="n">Activator</span><span class="p">.</span><span class="n">CreateInstance</span><span class="p">(</span><span class="n">ViewDataProvider</span><span class="p">)</span> <span class="k">as</span> <span class="n">IErrorViewDataProvider</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">modelProvider</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span>
+</span><span class='line'>                <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">result</span><span class="p">.</span><span class="n">ViewData</span> <span class="p">=</span> <span class="n">modelProvider</span><span class="p">.</span><span class="n">GetViewData</span><span class="p">(</span><span class="n">filterContext</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">Model</span> <span class="k">as</span> <span class="n">HandleErrorInfo</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s add this filter to Home/Index as shown below.</p>
+
+<figure class='code'><figcaption><span>HomeController.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'>      <span class="n">ndleErrorWithCustomViewData</span><span class="p">(</span><span class="n">View</span><span class="p">=</span><span class="s">&quot;ErrorWithCustomModel&quot;</span><span class="p">,</span> <span class="n">ViewDataProvider</span> <span class="p">=</span> <span class="k">typeof</span><span class="p">(</span><span class="n">ErrorViewDataProvider</span><span class="p">))]</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="n">ViewBag</span><span class="p">.</span><span class="n">Temperature</span> <span class="p">=</span> <span class="s">&quot;67&quot;</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">();</span>
+</span><span class='line'>            <span class="n">ViewBag</span><span class="p">.</span><span class="n">Message</span> <span class="p">=</span> <span class="s">&quot;Modify this template to jump-start your ASP.NET MVC application.&quot;</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>if you run the application now, you should see Custom Error View with custom model, displaying ContactNo correctly from model.</p>
+
+<p><img src="http://objectcraftworks.github.io/images/posts/aspdotnetmvc/error_viewdata_with_custom_model.png"></p>
+
+<p>We have seen how we can use filters to extend the ASP.NET/MVC framework and handle exceptions in MVC way, and keep our code DRY.</p>
+
+<blockquote><ul>
+<li>In Part1, We covered the default exception handling mechanism</li>
+<li>In Part2, We extended default error filter to pass the View Data items set by a controller to Error View</li>
+<li>In Part3, We wrote an exception filter by extending the default filter to use Custom model and set the model for the error view.</li>
+<li>In Part4, We extended what we will learned so far, and provided a way to set the custom view data provider for the error view.</li>
+</ul>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ASP.NET MVC Exception Handling Part 3: Custom Model for Error View]]></title>
+    <link href="http://objectcraftworks.github.io/blog/2013/07/23/custom-model-for-errorview/"/>
+    <updated>2013-07-23T16:07:00-04:00</updated>
+    <id>http://objectcraftworks.github.io/blog/2013/07/23/custom-model-for-errorview</id>
+    <content type="html"><![CDATA[<p>In <a href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained">Part1</a> of this article, we covered default exception handling of the ASP.NET/MVC framework.
+<a href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">Part2</a> covered how to keep the view data set by the controller for error view and master/layout.
+ In this part, we will cover how to use a custom model.</p>
+
+<p>   With default exception handling mechanism of the framework, you are stuck with the model framework supplies. When an exception is caught by the framework, It creates an object of the type <code>HandleErrorInfo</code>
+and passes to the Error View.
+ The framework doesn&rsquo;t provide any provision to extend this model or use different model altogether.</p>
+
+<p>We will see how to provide an hook to extend the model.</p>
+
+<p> <!-- more -->
+Let&rsquo;s do this with our example of displaying customer contact information based on the context. This context could vary on things such customer location, type of error, or customer serving system, tech support etc.
+Let&rsquo;s define a model for this.</p>
+
+<figure class='code'><figcaption><span>CustomModel </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">CustomModel</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">public</span> <span class="n">Exception</span> <span class="n">Exception</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>    <span class="k">public</span> <span class="n">SupportInfo</span> <span class="n">SupportInfo</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">SupportInfo</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>   <span class="k">public</span> <span class="kt">string</span> <span class="n">ContactNo</span><span class="p">{</span><span class="k">get</span><span class="p">;</span><span class="k">set</span><span class="p">;}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s see how we would have done if it were happy path views.
+We would</p>
+
+<ol>
+<li>create a model to encapsulate this information</li>
+<li>load the model from data store or some other system based on the context</li>
+<li>set this model in the Controller/Action</li>
+<li>View uses this model to display the information.</li>
+</ol>
+
+
+<p>When we do above steps, the code would look as shown below.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">SomeAction</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'> <span class="c1">//controller context</span>
+</span><span class='line'> <span class="kt">var</span> <span class="n">supportInfo</span> <span class="p">=</span> <span class="n">GetSupportInfo</span><span class="p">(</span><span class="n">ControllerContext</span><span class="p">);</span><span class="c1">//a call to either your repo, or service</span>
+</span><span class='line'> <span class="k">return</span> <span class="nf">View</span><span class="p">(</span><span class="n">supportInfo</span><span class="p">);</span><span class="c1">//which sets the model on the view</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+  That&rsquo;s a clean separation of concerns, of course the beauty of this code structure is coming from MVC pattern.</p>
+
+<p>  We would expect same thing happening even for Error Views. But that&rsquo;s not the case. The framework handles error views differently. It sets the model and doesn&rsquo;t carry the ViewData set in Controller/Actions.</p>
+
+<p>   We have only one option to implement this. We will have to put the logic of loading the model in the error page it self. That fixes the problem, but it&rsquo;s not clear separation of concerns.</p>
+
+<p>   What we need to solve this problem correctly is a way to the framework use our model instead of default model HandlerErrorInfo.
+ if we define model for our customer support information,
+  <code>SupportInfo</code>,
+   We need to LoadSupportInfo, and set that as a model, similar to what we would normally do for happy path views.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="c1">//controller context</span>
+</span><span class='line'><span class="kt">var</span> <span class="n">supportInfo</span> <span class="p">=</span> <span class="n">GetSupportInfo</span><span class="p">(</span><span class="n">ControllerContext</span><span class="p">);</span>
+</span><span class='line'><span class="n">ViewResult</span><span class="p">.</span><span class="n">ViewData</span><span class="p">.</span><span class="n">Model</span> <span class="p">=</span> <span class="n">supportInfo</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>It turns out that we can this by extending HandleError filter.
+   HandleError allows you specify error(default is Error.cshtml) or master/layout for your error view. Here is how you can specify different error, and layout.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">  [HandleError(Master=&quot;_ErrorLayout&quot;, View=&quot;ErrorWithCustomModel&quot;)]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> <br/>
+  This is a good thing that HandleError allows custom views and layouts, but not custom model.</p>
+
+<p> We can add something to this filter to allow us to specify a custom model.
+The filter should call our code that loads the data and sets the model on view.
+We are essentially providing a model to the framework. So we can add a new property to filter, we can call it ModelProvider.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">  [HandleErrorWithCustomModel(View=&quot;ErrorWithCustomModel&quot;, ModelProvider=typeof(ErrorModelProvider))]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  Now we need define a contract for ModelProvider.
+As Filter has two items it can pass to this model provider: ErrorContext, and the default model it creates. Let&rsquo;s define the signature</p>
+
+<figure class='code'><figcaption><span>contract </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">interface</span> <span class="n">IErrorModelProvider</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="kt">object</span> <span class="nf">GetModel</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">,</span> <span class="n">HandleErrorInfo</span> <span class="n">defaultModel</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can implement it as shown below.</p>
+
+<figure class='code'><figcaption><span>implementation </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">ErrorModelProvider</span> <span class="p">:</span><span class="n">IErrorModelProvider</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">public</span> <span class="kt">object</span> <span class="nf">GetModel</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">,</span> <span class="n">HandleErrorInfo</span> <span class="n">defaultModel</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="n">CustomModel</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>               <span class="n">Exception</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">Exception</span><span class="p">,</span>
+</span><span class='line'>               <span class="n">SupportInfo</span> <span class="p">=</span> <span class="n">GetSupportInfo</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>           <span class="p">};</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">SupportInfo</span> <span class="nf">GetSupportInfo</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">){</span>
+</span><span class='line'>     <span class="k">return</span> <span class="k">new</span> <span class="n">SupportInfo</span><span class="p">{</span>
+</span><span class='line'>          <span class="n">ContactNo</span> <span class="p">=</span> <span class="s">&quot;1800SUPPORT&quot;</span><span class="p">;</span>
+</span><span class='line'>       <span class="p">};</span><span class="c1">// or you can load it from external source</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Now that we have custom model, let&rsquo;s extend the default filter to use this model.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">   [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">class</span> <span class="nc">HandleErrorWithCustomModelAttribute</span> <span class="p">:</span> <span class="n">HandleErrorAttribute</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">public</span> <span class="n">Type</span> <span class="n">ModelProvider</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnException</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">filterContext</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">base</span><span class="p">.</span><span class="n">OnException</span><span class="p">(</span><span class="n">filterContext</span><span class="p">);</span>
+</span><span class='line'>            <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Result</span> <span class="k">as</span> <span class="n">ViewResult</span><span class="p">;</span>
+</span><span class='line'>            <span class="kt">var</span> <span class="n">modelProvider</span> <span class="p">=</span> <span class="n">Activator</span><span class="p">.</span><span class="n">CreateInstance</span><span class="p">(</span><span class="n">ModelProvider</span><span class="p">)</span> <span class="k">as</span> <span class="n">IErrorModelProvider</span><span class="p">;</span>
+</span><span class='line'>            <span class="kt">var</span> <span class="n">model</span> <span class="p">=</span> <span class="n">modelProvider</span><span class="p">.</span><span class="n">GetModel</span><span class="p">(</span><span class="n">filterContext</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">Model</span> <span class="k">as</span> <span class="n">HandleErrorInfo</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">result</span><span class="p">.</span><span class="n">ViewData</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ViewDataDictionary</span><span class="p">(</span><span class="n">model</span><span class="p">);</span>
+</span><span class='line'>            <span class="c1">//If you need ViewData set by controller, You can add items of Controller.ViewData to View&#39;s ViewData.</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s add this filter to Home/Index as shown below.</p>
+
+<figure class='code'><figcaption><span>HomeController.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">  [HandleErrorWithCustomModel(View=&quot;ErrorWithCustomModel&quot;, ModelProvider = typeof(ErrorModelProvider))]</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="n">ViewBag</span><span class="p">.</span><span class="n">Temperature</span> <span class="p">=</span> <span class="s">&quot;67&quot;</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">();</span>
+</span><span class='line'>            <span class="n">ViewBag</span><span class="p">.</span><span class="n">Message</span> <span class="p">=</span> <span class="s">&quot;Modify this template to jump-start your ASP.NET MVC application.&quot;</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>if you run the application now, you should see Custom Error View with custom model, displaying ContactNo correctly from model.</p>
+
+<p><img src="http://objectcraftworks.github.io/images/posts/aspdotnetmvc/error_custom_model.png"></p>
+
+<p>  In this part, we have seen how to extend the default exception filter to use custom models.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & its Master/Layout]]></title>
+    <link href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/"/>
+    <updated>2013-07-18T16:07:00-04:00</updated>
+    <id>http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling</id>
+    <content type="html"><![CDATA[<p>   In <a href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained">Part1</a> of this article, we covered default exception handling of the ASP.NET/MVC framework.
+   In this part, We will see how to keep the view data set by the controller for error view and master/layout.</p>
+
+<p>If you want your Error View use a master that uses ViewData/ViewBag, You will have to set it again in Error View, which will be a duplicate code.</p>
+
+<p> Let&rsquo;s see how we can display the temperature in every page a site.
+ To display the temperature in every page, we will have to add to a layout as shown below.</p>
+
+<figure class='code'><figcaption><span>_Layout.cshtml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;Label&gt;</span>@ViewBag.Temperature<span class="nt">&lt;/Label&gt;</span><span class="ni">&amp;deg;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p> <!-- more -->
+Then, we will have to set the <code>ViewBag.Temperature</code> somewhere.
+There are multiple ways you can set ViewData for master layouts.
+You can set using a base controller, or in an action/result filter, or in actions. Though this is not a good practice to set it in an action for production code as this would result in duplicate code, we will set it in an action for this example.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">ViewBag</span><span class="p">.</span><span class="n">Temperature</span> <span class="p">=</span> <span class="s">&quot;67&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+</span><span class='line'> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now you should see 67&deg; in the page, if you run it.</p>
+
+<p>Now let&rsquo;s say some thing happens immediately after ViewBag.Temperature and causes an exception. Let&rsquo;s throw an exception and run the application.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">ViewBag</span><span class="p">.</span><span class="n">Temperature</span> <span class="p">=</span> <span class="s">&quot;67&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">throw</span> <span class="k">new</span> <span class="nf">Excepion</span><span class="p">();</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+</span><span class='line'> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The temperature wouldn&rsquo;t be displayed and would be just &deg; in the error view.</p>
+
+<p>What happened?</p>
+
+<p> The MVC framework doesn&rsquo;t keep the viewdata/viewbag set by actions in the event of exceptions. When the framework creates the error view, it just simply sets the model of type HandleErrorInfo, which gives the Error View an access to the exception.</p>
+
+<p>Now, let&rsquo;s see how we could solve this problem. We could set the temperature again in Error View. But that will be a duplicate code. We don&rsquo;t want to do that.</p>
+
+<p>Instead of setting it again, we could retain the Controller ViewData/ViewBag, and set on the View even in the event of exception as shown below.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'>   <span class="n">ViewResult</span><span class="p">.</span><span class="n">ViewData</span> <span class="p">=</span> <span class="n">Controller</span><span class="p">.</span><span class="n">ViewData</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we want this piece of code to be called when an exception is raised.
+Where do we add this code?</p>
+
+<blockquote><p>It turns out that ASP.NET MVC provides exception filters exactly for this reason.</p></blockquote>
+
+<p>We could write a new exception filter where we can set ViewResult&rsquo;s ViewData.
+We will have to register this filter to Global Filters. We need to make sure our filter gets called after the default filter is called.So the order of the filters is important. Make sure you add this filter before the HandleError filter.</p>
+
+<p>Instead of worrying about the order, we could just extend the HandleError filter, and add this filter to Global Filter.</p>
+
+<p>Let&rsquo;s see how we can extend the HandleError Filter.Let&rsquo;s call our new filter HandleErrorWithViewDataAttribute.</p>
+
+<p>Let&rsquo;s do some simple testing before adding any code.
+To make sure Error View is getting the model, let&rsquo;s go ahead use the model in the View by accessing Exception.</p>
+
+<figure class='code'><figcaption><span>/Shared/Error.cshtml </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>   <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;redhead&quot;</span><span class="nt">&gt;</span>A minor error has occured: @Model.Exception.Message<span class="nt">&lt;/span&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+ and throw an exception in Index action of HomeController. If you run the application now, you should see a message.</p>
+
+<p>Now that we have something to tell us that we didn&rsquo;t break any thing. Let&rsquo;s go aahead extend the HandleError filter.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">  [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]</span>
+</span><span class='line'> <span class="k">public</span> <span class="k">class</span> <span class="nc">HandleErrorWithViewDataAttribute</span> <span class="p">:</span> <span class="n">HandleErrorAttribute</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'>    <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnException</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">filterContext</span><span class="p">){</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+Let&rsquo;s call our code that sets ViewData on ViewResult. We will have to cast Result to ViewResult type.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Result</span> <span class="k">as</span> <span class="n">ViewResult</span><span class="p">;</span>
+</span><span class='line'><span class="n">result</span><span class="p">.</span><span class="n">ViewData</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Controller</span><span class="p">.</span><span class="n">ViewData</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, let&rsquo;s run the application to test our code.We are expecting to have an error view with the message and the temperature. But you will get a Yellow screen error page. What happened?
+If you debug the application, you will see that model in the error view is null.</p>
+
+<p>So when we set</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'>  <span class="n">result</span><span class="p">.</span><span class="n">ViewData</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Controller</span><span class="p">.</span><span class="n">ViewData</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> , we are overriding the ViewData and the model set by the base class HandleError. That should explain why Error didn&rsquo;t receive model.</p>
+
+<blockquote><p>@Model in the view is actually ViewData.Model.</p></blockquote>
+
+<p>Now instead of setting entire object, we can just add keys that don&rsquo;t exist in the ViewResult.Add following code to your filter. Make sure you remove the code tthat sets entire ViewData.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="kt">var</span> <span class="n">keysNeedToSetInView</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Controller</span>
+</span><span class='line'>             <span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">item</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">result</span><span class="p">.</span><span class="n">ViewData</span><span class="p">.</span><span class="n">ContainsKey</span><span class="p">(</span><span class="n">item</span><span class="p">.</span><span class="n">key</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">item</span> <span class="k">in</span> <span class="n">keysNeedToSetInView</span><span class="p">)</span>
+</span><span class='line'> <span class="p">{</span>
+</span><span class='line'>    <span class="n">result</span><span class="p">.</span><span class="n">ViewData</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">item</span><span class="p">);</span>
+</span><span class='line'> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, you should error message, and temperature when you run the appication as shown below.
+<img src="http://objectcraftworks.github.io/images/posts/aspdotnetmvc/error_layout_viewdata.png"></p>
+
+<p>You can get the full lister for the filter from Github.</p>
+
+<div><script src='https://gist.github.com/6065646.js?file=HandleErrorWithViewDataAttribute.cs'></script>
+<noscript><pre><code>using System;
+using System.Linq;
+using System.Web.Mvc;
+
+namespace ObjectCraftworks
+{
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    public class HandleErrorWithViewDataAttribute:HandleErrorAttribute
+    {
+        public override void OnException(ExceptionContext filterContext)
+        {
+            //skip if already handled
+            if (filterContext.ExceptionHandled == true)
+                return;
+            base.OnException(filterContext);
+            //skip if not handled by base
+            if (filterContext.ExceptionHandled == false)
+                return;
+            
+            var result = filterContext.Result as ViewResult;
+            //Skip if not ViewResult
+            if (result == null)
+                return;
+            //Skip the keys that is already in ViewResult's ViewData
+            var keysToBeAdded = filterContext.Controller
+                                             .ViewData
+                                             .Where(item =&gt; !result.ViewData.ContainsKey(item.Key));
+            foreach (var item in keysToBeAdded)
+            {
+                result.ViewData.Add(item);
+            }
+        }
+    }
+}</code></pre></noscript></div>
+
+
+<p>We override the default behavior of the HandleError filter, and set the viewdata keys on the ViewResult. This enabled us to use a master/layout for an error view.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ASP.NET/MVC Exception Handling Part1: Framework Exception Handling Explained]]></title>
+    <link href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained/"/>
+    <updated>2013-07-18T16:07:00-04:00</updated>
+    <id>http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained</id>
+    <content type="html"><![CDATA[<p> ASP.NET MVC framework provides a mechanism to handle exceptions thrown by mvc pipeline including your actions. It&rsquo;s very basic. It doesn&rsquo;t scale very well
+in real world situations. There are atleast two such situations I ran into.
+The framework default exception handling doesn&rsquo;t handle these two situations.</p>
+
+<blockquote><ol>
+<li>If you need a custom model for your Error view.</li>
+<li>If your Error view needs a master/layout that depends on ViewData set by controllers.</li>
+</ol>
+</blockquote>
+
+<p>You will have to duplicate the code in the error view to handle these two situationsi. Lets see with a mockup.
+ <img src="http://objectcraftworks.github.io/images/posts/aspdotnetmvc/exception_handling_problem.png"></p>
+
+<p> Let&rsquo;s see how we would implement temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.</p>
+
+<p> <!-- more -->
+ If you want to pass contact information based on the customer location, you will have to set it in Error View. This will couple view with domain logic, undermining MVC phiolosphy of seperation of concerns.</p>
+
+<p>  We will develop new filters to handle these situation in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.</p>
+
+<p>This article is a four part series.</p>
+
+<p>  We will see in</p>
+
+<pre><code>1. Part 1, how basic exception handling works. 
+2. Part 2, how to keep the view data set by controllers for Error Views. 
+3. Part 3, how to use a custom model.
+4. Part 4, how to set custom ViewData for ErrorViews. 
+</code></pre>
+
+<p>ASP.NET MVC Framework provides exception handling, and we will see how it works in this part.  (if you are familiar with the framework, you can skip this part.)</p>
+
+<blockquote><p>if you want to follow along hands on, You can create a ASP.NET MVC<br/>
+ web application. I am using MVC 4 version.</p></blockquote>
+
+<p>When you create a MVC project, it does two things for error handling purpose</p>
+
+<pre><code>    1. Creates an error view in shared folder (/Views/Shared/Error.cshtml)
+    2. Adds HandleError filter to Global filters (/AppStart/FilterConfig.cs) 
+</code></pre>
+
+<p>Let&rsquo;s first see the contents of the Error view. You would notice model type. The Framework passes HandleErrorInfo to the view.</p>
+
+<figure class='code'><figcaption><span>Views/Shared/Error.cshtml </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>@model System.Web.Mvc.HandleErrorInfo
+</span><span class='line'>
+</span><span class='line'>@{
+</span><span class='line'>   ViewBag.Title = &quot;Error&quot;;
+</span><span class='line'> }
+</span><span class='line'> <span class="nt">&lt;hgroup</span> <span class="na">class=</span><span class="s">&quot;title&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'> <span class="nt">&lt;h1</span> <span class="na">class=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;</span>Error.<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'> <span class="nt">&lt;h2</span> <span class="na">class=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;</span>An error occurred while processing your request.<span class="nt">&lt;/h2&gt;</span>
+</span><span class='line'> <span class="nt">&lt;/hgroup&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+ We will talk about HandleErrorInfo type in a bit.</p>
+
+<p>Now, Let&rsquo;s see the contents of the FilterConfig.cs file. You would see HandleErrorAttribute filter is added to Global Filter Collection.</p>
+
+<figure class='code'><figcaption><span>AppStart/FilterConfig.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="k">public</span> <span class="k">class</span> <span class="nc">FilterConfig</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterGlobalFilters</span><span class="p">(</span><span class="n">GlobalFilterCollection</span> <span class="n">filters</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="n">filters</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HandleErrorAttribute</span><span class="p">());</span> <span class="p">***(</span><span class="m">2</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> To see whether default mechanism is working fine, let&rsquo;s throw an exception,as show below, in HomeController/Index action.</p>
+
+<figure class='code'><figcaption><span>Controllers/HomeController.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">();</span>
+</span><span class='line'>            <span class="n">ViewBag</span><span class="p">.</span><span class="n">Message</span> <span class="p">=</span> <span class="s">&quot;Modify this template to jump-start your ASP.NET MVC application.&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, if you haven&rsquo;t enabled custom errors, you just need to enable it to have mvc framework default exception mechanism to work.</p>
+
+<figure class='code'><figcaption><span>web.config</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;system.web&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;customErrors</span> <span class="na">mode=</span><span class="s">&quot;On&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>          <span class="c">&lt;!-- On/RemoteOnly. For this post, I used On --&gt;</span>
+</span><span class='line'><span class="nt">&lt;/system.web&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Now run the application. You should see the error page.</p>
+
+<p><img src="http://objectcraftworks.github.io/images/posts/aspdotnetmvc/error_page.png" title="Default Error Page" ></p>
+
+<p> Now that we saw how default exception handling works,</p>
+
+<blockquote><p>let&rsquo;s summarize the code elements we noticed.</p>
+
+<ul>
+<li>HandleError filter</li>
+<li>HandleErrorInfo model for Error view</li>
+<li>GlobalFilters</li>
+<li>Error view
+We will briefly go through each element, and see what it does.</li>
+</ul>
+</blockquote>
+
+<h4>HandleError filter</h4>
+
+<p> The important code element of framework default exception handling is HandleErrorAttribute. HandleErrorAttribute is actually an exception filter. There are several types of filters in MVC framework to extend the behavior of the actions.
+Exception filter is one of them. Exception filters are called when an exception is caught by the framework.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">HandleErrorAttribute</span> <span class="p">:</span> <span class="n">FilterAttribute</span><span class="p">,</span> <span class="n">IExceptionFilter</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> The HandleError filter is framework&rsquo;s default exception filter to handle exceptions globally. This is done by adding this filter to Global filters as seen in FilterConfig.cs.</p>
+
+<figure class='code'><figcaption><span>AppStart/FilterConfig.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'>        <span class="n">filters</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HandleErrorAttribute</span><span class="p">());</span> <span class="p">***(</span><span class="m">2</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> The basic behavior of this filter is this:</p>
+
+<pre><code>create a ViewResult using given View and Master
+create a model of type HandleErrorInfo 
+set the model on ViewData of the ViewResult
+set the HTTP status to 500
+</code></pre>
+
+<p> HandleError need not to be global. You can handle exception either at an action level or at controller level.</p>
+
+<p> If you want to handle a particular exception differently with a custom view and/or master, You can do that too.
+ For example, if you want to handle ArgumentNullException differently Index action with different error and/or master, you can do as shown below</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na"> [HandleError(ExceptionType=typeof(ArgumentNullException),Order = 1, Master=&quot;_ErrorLayout&quot;, View=&quot;CustomError&quot;)]</span>
+</span><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Now that we have seen how HandleError works, let&rsquo;s see next important code element</p>
+
+<h4>HandleErrorInfo</h4>
+
+<p>The model that is passed to Error view is of type HandleErrorInfo. HandleErrorInfo just have Exception that is being handled, and names of Controller and action.</p>
+
+<h4>Global filters</h4>
+
+<p> The framework defines scope and order for how the filters are called.
+Global scope is last in the order, but gets called for every action.
+That&rsquo;s why framework adds the HandleError filter to the Global Filter collection. It doesnot stop you add the filter at action or controller levels.</p>
+
+<h4>Error View</h4>
+
+<p> The framework generates very basic view. It has access to HandleErrorInfo. Using the model, you can get Exception that is being handled, and the action/controller that caused the exception.</p>
+
+<blockquote><p>We have seen how ASP.NET MVC framework provides exception handling, and how following code elements play the role</p>
+
+<pre><code>HandleError filter
+HandleErrorInfo model for Error View
+Global Filters to handle exceptions globally
+An error view 
+</code></pre></blockquote>
+]]></content>
+  </entry>
   
 </feed>

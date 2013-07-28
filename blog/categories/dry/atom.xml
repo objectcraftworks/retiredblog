@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: DRY | Object Craftworks]]></title>
+  <link href="http://objectcraftworks.github.io/blog/categories/dry/atom.xml" rel="self"/>
+  <link href="http://objectcraftworks.github.io/"/>
+  <updated>2013-07-28T17:06:59-04:00</updated>
+  <id>http://objectcraftworks.github.io/</id>
+  <author>
+    <name><![CDATA[ObjectCraftworks.com]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ASP.NET/MVC Exception Handling Part1: Framework Exception Handling Explained]]></title>
+    <link href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained/"/>
+    <updated>2013-07-18T16:07:00-04:00</updated>
+    <id>http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained</id>
+    <content type="html"><![CDATA[<p> ASP.NET MVC framework provides a mechanism to handle exceptions thrown by mvc pipeline including your actions. It&rsquo;s very basic. It doesn&rsquo;t scale very well
+in real world situations. There are atleast two such situations I ran into.
+The framework default exception handling doesn&rsquo;t handle these two situations.</p>
+
+<blockquote><ol>
+<li>If you need a custom model for your Error view.</li>
+<li>If your Error view needs a master/layout that depends on ViewData set by controllers.</li>
+</ol>
+</blockquote>
+
+<p>You will have to duplicate the code in the error view to handle these two situationsi. Lets see with a mockup.
+ <img src="/images/posts/aspdotnetmvc/exception_handling_problem.png"></p>
+
+<p> Let&rsquo;s see how we would implement temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.</p>
+
+<p> <!-- more -->
+ If you want to pass contact information based on the customer location, you will have to set it in Error View. This will couple view with domain logic, undermining MVC phiolosphy of seperation of concerns.</p>
+
+<p>  We will develop new filters to handle these situation in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.</p>
+
+<p>This article is a four part series.</p>
+
+<p>  We will see in</p>
+
+<pre><code>1. Part 1, how basic exception handling works. 
+2. Part 2, how to keep the view data set by controllers for Error Views. 
+3. Part 3, how to use a custom model.
+4. Part 4, how to set custom ViewData for ErrorViews. 
+</code></pre>
+
+<p>ASP.NET MVC Framework provides exception handling, and we will see how it works in this part.  (if you are familiar with the framework, you can skip this part.)</p>
+
+<blockquote><p>if you want to follow along hands on, You can create a ASP.NET MVC<br/>
+ web application. I am using MVC 4 version.</p></blockquote>
+
+<p>When you create a MVC project, it does two things for error handling purpose</p>
+
+<pre><code>    1. Creates an error view in shared folder (/Views/Shared/Error.cshtml)
+    2. Adds HandleError filter to Global filters (/AppStart/FilterConfig.cs) 
+</code></pre>
+
+<p>Let&rsquo;s first see the contents of the Error view. You would notice model type. The Framework passes HandleErrorInfo to the view.</p>
+
+<p>``` html Views/Shared/Error.cshtml</p>
+
+<pre><code>@model System.Web.Mvc.HandleErrorInfo 
+
+@{
+   ViewBag.Title = "Error";
+ }
+ &lt;hgroup class="title"&gt;
+ &lt;h1 class="error"&gt;Error.&lt;/h1&gt;
+ &lt;h2 class="error"&gt;An error occurred while processing your request.&lt;/h2&gt;
+ &lt;/hgroup&gt;
+</code></pre>
+
+<p>```
+ We will talk about HandleErrorInfo type in a bit.</p>
+
+<p>Now, Let&rsquo;s see the contents of the FilterConfig.cs file. You would see HandleErrorAttribute filter is added to Global Filter Collection.</p>
+
+<p>``` csharp AppStart/FilterConfig.cs</p>
+
+<p> public class FilterConfig</p>
+
+<pre><code>{
+    public static void RegisterGlobalFilters(GlobalFilterCollection filters)
+    {
+        filters.Add(new HandleErrorAttribute()); ***(2)
+    }
+}
+</code></pre>
+
+<p>```
+ To see whether default mechanism is working fine, let&rsquo;s throw an exception,as show below, in HomeController/Index action.</p>
+
+<p>``` csharp Controllers/HomeController.cs
+ public ActionResult Index()</p>
+
+<pre><code>    {
+        throw new ArgumentNullException();
+        ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
+
+        return View();
+    }
+</code></pre>
+
+<p>```</p>
+
+<p>Now, if you haven&rsquo;t enabled custom errors, you just need to enable it to have mvc framework default exception mechanism to work.
+``` xml web.config
+&lt;system.web></p>
+
+<pre><code>  &lt;customErrors mode="On"/&gt; 
+      &lt;!-- On/RemoteOnly. For this post, I used On --&gt;
+</code></pre>
+
+<p>&lt;/system.web>
+```
+ Now run the application. You should see the error page.</p>
+
+<p><img src="/images/posts/aspdotnetmvc/error_page.png" title="Default Error Page" ></p>
+
+<p> Now that we saw how default exception handling works,</p>
+
+<blockquote><p>let&rsquo;s summarize the code elements we noticed.</p>
+
+<ul>
+<li>HandleError filter</li>
+<li>HandleErrorInfo model for Error view</li>
+<li>GlobalFilters</li>
+<li>Error view
+We will briefly go through each element, and see what it does.</li>
+</ul>
+</blockquote>
+
+<h4>HandleError filter</h4>
+
+<p> The important code element of framework default exception handling is HandleErrorAttribute. HandleErrorAttribute is actually an exception filter. There are several types of filters in MVC framework to extend the behavior of the actions.
+Exception filter is one of them. Exception filters are called when an exception is caught by the framework.
+<code>csharp    
+public class HandleErrorAttribute : FilterAttribute, IExceptionFilter  
+</code>
+ The HandleError filter is framework&rsquo;s default exception filter to handle exceptions globally. This is done by adding this filter to Global filters as seen in FilterConfig.cs.</p>
+
+<p>``` csharp AppStart/FilterConfig.cs</p>
+
+<pre><code>        filters.Add(new HandleErrorAttribute()); ***(2)
+</code></pre>
+
+<p>```</p>
+
+<p> The basic behavior of this filter is this:</p>
+
+<pre><code>create a ViewResult using given View and Master
+create a model of type HandleErrorInfo 
+set the model on ViewData of the ViewResult
+set the HTTP status to 500
+</code></pre>
+
+<p> HandleError need not to be global. You can handle exception either at an action level or at controller level.</p>
+
+<p> If you want to handle a particular exception differently with a custom view and/or master, You can do that too.
+ For example, if you want to handle ArgumentNullException differently Index action with different error and/or master, you can do as shown below</p>
+
+<p><code>csharp  
+ [HandleError(ExceptionType=typeof(ArgumentNullException),Order = 1, Master="_ErrorLayout", View="CustomError")]
+ public ActionResult Index()
+</code></p>
+
+<p>Now that we have seen how HandleError works, let&rsquo;s see next important code element</p>
+
+<h4>HandleErrorInfo</h4>
+
+<p>The model that is passed to Error view is of type HandleErrorInfo. HandleErrorInfo just have Exception that is being handled, and names of Controller and action.</p>
+
+<h4>Global filters</h4>
+
+<p> The framework defines scope and order for how the filters are called.
+Global scope is last in the order, but gets called for every action.
+That&rsquo;s why framework adds the HandleError filter to the Global Filter collection. It doesnot stop you add the filter at action or controller levels.</p>
+
+<h4>Error View</h4>
+
+<p> The framework generates very basic view. It has access to HandleErrorInfo. Using the model, you can get Exception that is being handled, and the action/controller that caused the exception.</p>
+
+<blockquote><p>We have seen how ASP.NET MVC framework provides exception handling, and how following code elements play the role</p>
+
+<pre><code>HandleError filter
+HandleErrorInfo model for Error View
+Global Filters to handle exceptions globally
+An error view 
+</code></pre></blockquote>
+]]></content>
+  </entry>
+  
+</feed>

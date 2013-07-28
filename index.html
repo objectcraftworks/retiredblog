@@ -9,7 +9,7 @@
   <meta name="author" content="ObjectCraftworks.com">
 
   
-  <meta name="description" content=" Blog Archives Recent Posts ">
+  <meta name="description" content="As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,14 +18,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://objectcraftworks.github.io">
+  <link rel="canonical" href="http://objectcraftworks.github.io/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="Object Craftworks" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Object Craftworks" type="application/atom+xml">
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -38,7 +37,7 @@
   <header role="banner"><hgroup>
   <h1><a href="/">Object Craftworks</a></h1>
   
-    <h2>{"by craftspeople"=>nil}</h2>
+    <h2><sup>{ Software by Craftspeople }</sup></h2>
   
 </hgroup>
 
@@ -66,6 +65,204 @@
       <div class="blog-index">
   
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/24/asp-dot-net-mvc-viewdata-provider-for-error-view/">ASP.NET/MVC Exception Handling Part 4: ViewDataProvider for Error View</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-24T16:07:00-04:00" pubdate data-updated="true">Jul 24<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p> As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View.  We have seen in <a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling">part2</a> and <a href="/blog/2013/07/23/custom-model-for-errorview">part3</a>, how we can extend default exception filter to keep the viewdata items set by controller and to use custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use ideas from previous parts.</p>
+
+<p> </div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/24/asp-dot-net-mvc-viewdata-provider-for-error-view/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/23/custom-model-for-errorview/">ASP.NET MVC Exception Handling Part 3: Custom Model for Error View</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-23T16:07:00-04:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In <a href="/blog/2013/07/18/asp-dot-net-exception-handling-explained">Part1</a> of this article, we covered default exception handling of the ASP.NET/MVC framework.
+<a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">Part2</a> covered how to keep the view data set by the controller for error view and master/layout.
+ In this part, we will cover how to use a custom model.</p>
+
+<p>   With default exception handling mechanism of the framework, you are stuck with the model framework supplies. When an exception is caught by the framework, It creates an object of the type <code>HandleErrorInfo</code>
+and passes to the Error View.
+ The framework doesn&rsquo;t provide any provision to extend this model or use different model altogether.</p>
+
+<p>We will see how to provide an hook to extend the model.</p>
+
+<p> </div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/23/custom-model-for-errorview/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & Its Master/Layout</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-18T16:07:00-04:00" pubdate data-updated="true">Jul 18<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>   In <a href="/blog/2013/07/18/asp-dot-net-exception-handling-explained">Part1</a> of this article, we covered default exception handling of the ASP.NET/MVC framework.
+   In this part, We will see how to keep the view data set by the controller for error view and master/layout.</p>
+
+<p>If you want your Error View use a master that uses ViewData/ViewBag, You will have to set it again in Error View, which will be a duplicate code.</p>
+
+<p> Let&rsquo;s see how we can display the temperature in every page a site.
+ To display the temperature in every page, we will have to add to a layout as shown below.</p>
+
+<figure class='code'><figcaption><span>_Layout.cshtml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;Label&gt;</span>@ViewBag.Temperature<span class="nt">&lt;/Label&gt;</span><span class="ni">&amp;deg;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p> </div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/18/asp-dot-net-exception-handling-explained/">ASP.NET/MVC Exception Handling Part1: Framework Exception Handling Explained</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-18T16:07:00-04:00" pubdate data-updated="true">Jul 18<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p> ASP.NET MVC framework provides a mechanism to handle exceptions thrown by mvc pipeline including your actions. It&rsquo;s very basic. It doesn&rsquo;t scale very well
+in real world situations. There are atleast two such situations I ran into.
+The framework default exception handling doesn&rsquo;t handle these two situations.</p>
+
+<blockquote><ol>
+<li>If you need a custom model for your Error view.</li>
+<li>If your Error view needs a master/layout that depends on ViewData set by controllers.</li>
+</ol>
+</blockquote>
+
+<p>You will have to duplicate the code in the error view to handle these two situationsi. Lets see with a mockup.
+ <img src="/images/posts/aspdotnetmvc/exception_handling_problem.png"></p>
+
+<p> Let&rsquo;s see how we would implement temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.</p>
+
+<p> </div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/18/asp-dot-net-exception-handling-explained/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
   <div class="pagination">
     
     <a href="/blog/archives">Blog Archives</a>
@@ -77,6 +274,22 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/07/24/asp-dot-net-mvc-viewdata-provider-for-error-view/">ASP.NET/MVC Exception Handling Part 4: ViewDataProvider for Error View</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/23/custom-model-for-errorview/">ASP.NET MVC Exception Handling Part 3: Custom Model for Error View</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & its Master/Layout</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/18/asp-dot-net-exception-handling-explained/">ASP.NET/MVC Exception Handling Part1: Framework Exception Handling Explained</a>
+      </li>
     
   </ul>
 </section>
@@ -92,7 +305,7 @@
   </div>
   <footer role="contentinfo"><p>
   Copyright &copy; 2013 - ObjectCraftworks.com -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>. Design by <a href="http://octopressthemes.com">Octopress Themes</a>.</span>
 </p>
 
 </footer>
@@ -109,7 +322,7 @@
       var twitterWidgets = document.createElement('script');
       twitterWidgets.type = 'text/javascript';
       twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>
