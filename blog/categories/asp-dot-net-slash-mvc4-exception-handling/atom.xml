@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ASP.NET/MVC4 Exception Handling | Object Craftworks]]></title>
   <link href="http://objectcraftworks.github.io/blog/categories/asp-dot-net-slash-mvc4-exception-handling/atom.xml" rel="self"/>
   <link href="http://objectcraftworks.github.io/"/>
-  <updated>2013-07-28T17:06:59-04:00</updated>
+  <updated>2013-07-28T18:07:35-04:00</updated>
   <id>http://objectcraftworks.github.io/</id>
   <author>
     <name><![CDATA[ObjectCraftworks.com]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[ASP.NET/MVC Exception Handling Part1: Framework Exception Handling Explained]]></title>
+    <title type="html"><![CDATA[ASP.NET/MVC Exception Handling Part1: Exception Handling Explained]]></title>
     <link href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained/"/>
     <updated>2013-07-18T16:07:00-04:00</updated>
     <id>http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained</id>
@@ -28,7 +28,7 @@ The framework default exception handling doesn&rsquo;t handle these two situatio
 </ol>
 </blockquote>
 
-<p>You will have to duplicate the code in the error view to handle these two situationsi. Lets see with a mockup.
+<p>You will have to duplicate the code in the error view to handle these two situations. Lets see with a mockup.
  <img src="/images/posts/aspdotnetmvc/exception_handling_problem.png"></p>
 
 <p> Let&rsquo;s see how we would implement temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.</p>
@@ -36,7 +36,7 @@ The framework default exception handling doesn&rsquo;t handle these two situatio
 <p> <!-- more -->
  If you want to pass contact information based on the customer location, you will have to set it in Error View. This will couple view with domain logic, undermining MVC phiolosphy of seperation of concerns.</p>
 
-<p>  We will develop new filters to handle these situation in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.</p>
+<p>  We will develop new filters to handle these situations in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.</p>
 
 <p>This article is a four part series.</p>
 
