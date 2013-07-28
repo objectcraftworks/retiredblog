@@ -4,7 +4,7 @@
   <title><![CDATA[Object Craftworks]]></title>
   <link href="http://objectcraftworks.github.io/atom.xml" rel="self"/>
   <link href="http://objectcraftworks.github.io/"/>
-  <updated>2013-07-28T18:07:35-04:00</updated>
+  <updated>2013-07-28T19:17:53-04:00</updated>
   <id>http://objectcraftworks.github.io/</id>
   <author>
     <name><![CDATA[ObjectCraftworks.com]]></name>
@@ -648,11 +648,11 @@ namespace ObjectCraftworks
   
   <entry>
     <title type="html"><![CDATA[ASP.NET/MVC Exception Handling Part1: Exception Handling Explained]]></title>
-    <link href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained/"/>
-    <updated>2013-07-18T16:07:00-04:00</updated>
-    <id>http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-exception-handling-explained</id>
-    <content type="html"><![CDATA[<p> ASP.NET MVC framework provides a mechanism to handle exceptions thrown by mvc pipeline including your actions. It&rsquo;s very basic. It doesn&rsquo;t scale very well
-in real world situations. There are atleast two such situations I ran into.
+    <link href="http://objectcraftworks.github.io/blog/2013/07/17/asp-dot-net-exception-handling-explained/"/>
+    <updated>2013-07-17T16:07:00-04:00</updated>
+    <id>http://objectcraftworks.github.io/blog/2013/07/17/asp-dot-net-exception-handling-explained</id>
+    <content type="html"><![CDATA[<p> ASP.NET MVC framework provides a mechanism to handle exceptions. It&rsquo;s very basic. It doesn&rsquo;t scale very well
+in real world situations. There are atleast two such situations, I ran into.
 The framework default exception handling doesn&rsquo;t handle these two situations.</p>
 
 <blockquote><ol>
@@ -664,10 +664,10 @@ The framework default exception handling doesn&rsquo;t handle these two situatio
 <p>You will have to duplicate the code in the error view to handle these two situations. Lets see with a mockup.
  <img src="http://objectcraftworks.github.io/images/posts/aspdotnetmvc/exception_handling_problem.png"></p>
 
-<p> Let&rsquo;s see how we would implement temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.</p>
+<p> Let&rsquo;s see how we would implement the temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.</p>
 
 <p> <!-- more -->
- If you want to pass contact information based on the customer location, you will have to set it in Error View. This will couple view with domain logic, undermining MVC phiolosphy of seperation of concerns.</p>
+ If you want to pass contact information based on the customer location, you will have to set it in the view. This will tightly couple the View with the domain logic, undermining MVC phiolosphy of seperation of concerns.</p>
 
 <p>  We will develop new filters to handle these situations in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.</p>
 
@@ -692,7 +692,7 @@ The framework default exception handling doesn&rsquo;t handle these two situatio
     2. Adds HandleError filter to Global filters (/AppStart/FilterConfig.cs) 
 </code></pre>
 
-<p>Let&rsquo;s first see the contents of the Error view. You would notice model type. The Framework passes HandleErrorInfo to the view.</p>
+<p>Let&rsquo;s first see the contents of the Error view. You would notice <code>@model</code> set to HandleErrorInfo. The Framework passes HandleErrorInfo to the view.</p>
 
 <figure class='code'><figcaption><span>Views/Shared/Error.cshtml </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -728,16 +728,16 @@ The framework default exception handling doesn&rsquo;t handle these two situatio
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 </pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="k">public</span> <span class="k">class</span> <span class="nc">FilterConfig</span>
+</span><span class='line'> <span class="p">{</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterGlobalFilters</span><span class="p">(</span><span class="n">GlobalFilterCollection</span> <span class="n">filters</span><span class="p">)</span>
 </span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterGlobalFilters</span><span class="p">(</span><span class="n">GlobalFilterCollection</span> <span class="n">filters</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">filters</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HandleErrorAttribute</span><span class="p">());</span> <span class="p">***(</span><span class="m">2</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>       <span class="n">filters</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HandleErrorAttribute</span><span class="p">());</span>
 </span><span class='line'>    <span class="p">}</span>
+</span><span class='line'> <span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> To see whether default mechanism is working fine, let&rsquo;s throw an exception,as show below, in HomeController/Index action.</p>
+<p> To see whether the default mechanism is working fine, let&rsquo;s throw an exception,as shown below, in the HomeController/Index action.</p>
 
 <figure class='code'><figcaption><span>Controllers/HomeController.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -747,16 +747,16 @@ The framework default exception handling doesn&rsquo;t handle these two situatio
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 </pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">ViewBag</span><span class="p">.</span><span class="n">Message</span> <span class="p">=</span> <span class="s">&quot;Modify this template to jump-start your ASP.NET MVC application.&quot;</span><span class="p">;</span>
+</span><span class='line'> <span class="p">{</span>
+</span><span class='line'>    <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">ViewBag</span><span class="p">.</span><span class="n">Message</span> <span class="p">=</span> <span class="s">&quot;Modify this template to jump-start your ASP.NET MVC application.&quot;</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>            <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
-</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+</span><span class='line'> <span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now, if you haven&rsquo;t enabled custom errors, you just need to enable it to have mvc framework default exception mechanism to work.</p>
+<p>Now, if you haven&rsquo;t enabled custom errors, you just need to enable it in the <code>Web.Config</code>, as shown below, to have the framework&rsquo;s default exception mechanism to work.</p>
 
 <figure class='code'><figcaption><span>web.config</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -775,20 +775,21 @@ The framework default exception handling doesn&rsquo;t handle these two situatio
 
 <p> Now that we saw how default exception handling works,</p>
 
-<blockquote><p>let&rsquo;s summarize the code elements we noticed.</p>
+<blockquote><p>let&rsquo;s summarize the code elements we noticed so far.</p>
 
 <ul>
 <li>HandleError filter</li>
 <li>HandleErrorInfo model for Error view</li>
 <li>GlobalFilters</li>
-<li>Error view
-We will briefly go through each element, and see what it does.</li>
+<li>Error view</li>
 </ul>
 </blockquote>
 
+<p>We will briefly go through each element, and see what it does.</p>
+
 <h4>HandleError filter</h4>
 
-<p> The important code element of framework default exception handling is HandleErrorAttribute. HandleErrorAttribute is actually an exception filter. There are several types of filters in MVC framework to extend the behavior of the actions.
+<p> The important code element of the framework&rsquo;s default exception handling is HandleErrorAttribute. HandleErrorAttribute is actually an exception filter. There are several types of filters in MVC framework to extend the behavior of the actions.
 Exception filter is one of them. Exception filters are called when an exception is caught by the framework.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -799,22 +800,22 @@ Exception filter is one of them. Exception filters are called when an exception 
 <p> The HandleError filter is framework&rsquo;s default exception filter to handle exceptions globally. This is done by adding this filter to Global filters as seen in FilterConfig.cs.</p>
 
 <figure class='code'><figcaption><span>AppStart/FilterConfig.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'>        <span class="n">filters</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HandleErrorAttribute</span><span class="p">());</span> <span class="p">***(</span><span class="m">2</span><span class="p">)</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="n">filters</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HandleErrorAttribute</span><span class="p">());</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p> The basic behavior of this filter is this:</p>
 
-<pre><code>create a ViewResult using given View and Master
-create a model of type HandleErrorInfo 
-set the model on ViewData of the ViewResult
-set the HTTP status to 500
+<pre><code>creates a ViewResult using given View and Master
+creates a model of type HandleErrorInfo 
+sets the model on ViewData of the ViewResult
+sets the HTTP status to 500
 </code></pre>
 
-<p> HandleError need not to be global. You can handle exception either at an action level or at controller level.</p>
+<p> This filter need not to be global. You can handle exception either at an action level or at the controller level.</p>
 
 <p> If you want to handle a particular exception differently with a custom view and/or master, You can do that too.
- For example, if you want to handle ArgumentNullException differently Index action with different error and/or master, you can do as shown below</p>
+ For example, if you want to handle an ArgumentNullException differently for an Index action with different error and/or master, you can do as shown below</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -825,11 +826,12 @@ set the HTTP status to 500
 
 <p></p>
 
-<p>Now that we have seen how HandleError works, let&rsquo;s see next important code element</p>
+<p>Now that we have seen how this filter works, let&rsquo;s see next important code element.</p>
 
 <h4>HandleErrorInfo</h4>
 
-<p>The model that is passed to Error view is of type HandleErrorInfo. HandleErrorInfo just have Exception that is being handled, and names of Controller and action.</p>
+<p>We have seen in Error.cshtml that <code>@model</code> is set to <code>HandleErrorInfo</code>.
+HandleErrorInfo has properties for the  Exception that is being handled, and names of Controller and action.</p>
 
 <h4>Global filters</h4>
 
