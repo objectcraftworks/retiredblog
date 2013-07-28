@@ -1,7 +1,7 @@
 ---
 layout: post
 author: Craftsman
-title: "ASP.NET/MVC Exception Handling Part1: Framework Exception Handling Explained"
+title: "ASP.NET/MVC Exception Handling Part1: Exception Handling Explained"
 date: 2013-07-18 16:07
 comments: true
 categories:
@@ -19,7 +19,7 @@ The framework default exception handling doesn't handle these two situations.
 >  1. If you need a custom model for your Error view. 
 >  2. If your Error view needs a master/layout that depends on ViewData set by controllers.  
 
-You will have to duplicate the code in the error view to handle these two situationsi. Lets see with a mockup.
+You will have to duplicate the code in the error view to handle these two situations. Lets see with a mockup.
  {% img /images/posts/aspdotnetmvc/exception_handling_problem.png %}
 
  Let's see how we would implement temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.
@@ -27,7 +27,7 @@ You will have to duplicate the code in the error view to handle these two situat
  <!-- more -->
  If you want to pass contact information based on the customer location, you will have to set it in Error View. This will couple view with domain logic, undermining MVC phiolosphy of seperation of concerns.
  
-  We will develop new filters to handle these situation in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.
+  We will develop new filters to handle these situations in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.
 
 This article is a four part series. 
  
