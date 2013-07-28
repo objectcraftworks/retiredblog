@@ -18,6 +18,7 @@ and passes to the Error View.
 
 We will see how to provide an hook to extend the model. 
 
+ <!-- more -->
 Let's do this with our example of displaying customer contact information based on the context. This context could vary on things such customer location, type of error, or customer serving system, tech support etc. 
 Let's define a model for this.
      

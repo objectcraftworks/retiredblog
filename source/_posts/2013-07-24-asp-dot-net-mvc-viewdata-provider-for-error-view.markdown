@@ -7,23 +7,15 @@ comments: true
 categories:
  ASP.NET/MVC4
 ---
- n [Part1](/blog/2013/07/18/asp-dot-net-exception-handling-explained) of this article, we covered default exception handling of the ASP.NET/MVC framework.
-[Part2](/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling) covered how to keep the view data set by the controller for error view and master/layout.
-We used a custom model for an error view in [Part3](/blog/2013/07/23/custom-model-for-errorview). In this part, We will extend customization to ViewData, and provide a way to set the ViewData for an error view. 
-
-   The MVC framework keeps the model in a dictionary called ViewDataDictionary.
+ As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View.  We have seen in [part2](/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling) and [part3](/blog/2013/07/23/custom-model-for-errorview), how we can extend default exception filter to keep the viewdata items set by controller and to use custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use ideas from previous parts.
+ 
+ <!-- more -->
+ 
+  The MVC framework keeps the model in a dictionary called ViewDataDictionary.
 You can add view specific data as items to the dictionary.
 You can either directly access this items as you would in a dictionary, or use ViewBag, a dynamic object, which gives the items in the dictionary as properties.
 
- As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View. 
- We have seen in [part2](/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling) and [part3](/blog/2013/07/23/custom-model-for-errorview), how we can extend default exception filter to keep the viewdata items set by controller and to use custom model.
-
-  In this part,  we will see how we can extend the default filter to set the view data. We will use ideas from previous parts.
-
-  ViewData items and its model property actually constitutes ViewData/ViewModel for the view. 
- > The difference the framework is trying to make is that model property represents a domain entity. 
-
-So instead of justi having custom model & model provider, we will extend the default filter to take ViewDataProvider. This will allow to extend not only for the model but also the view data items if any needed. 
+  ViewData items and its model property actually constitutes ViewData/ViewModel for the view.  So instead of justi having custom model & model provider, we will extend the default filter to take ViewDataProvider. This will allow to extend not only for the model but also the view data items if any needed. 
 
 ``` csharp   
   [HandleErrorWithCustomViewData(View="ErrorWithCustomModel", ViewDataProvider=typeof(ErrorViewDataProvider))]

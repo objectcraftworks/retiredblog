@@ -1,0 +1,13 @@
+<ul class="main-navigation">
+ 
+  <li><a href="{{root_url }}">Home</a></li>
+  <li><a href="{{root_url }}/tutorials">Dive Deep</a></li>
+  <!-- 
+
+  <li><a href="{{root_url }}/craftsmanship">Craftsmanship</a></li>
+ <li><a href="{{root_url }}/crafts">Crafts</a></li>
+  <li><a href="{{root_url }}/getting_started">Get Your Feet Wet</a></li>
+  <li><a href="{{ root_url }}/blog">Blog</a></li>
+  <li><a href="{{root_url }}/trainings">Trainings</a></li>
+   <li><a href="{{ root_url }}/blog/archives">Archives</a></li> -->
+</ul>

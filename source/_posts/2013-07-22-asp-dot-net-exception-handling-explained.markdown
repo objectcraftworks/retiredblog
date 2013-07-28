@@ -24,6 +24,7 @@ You will have to duplicate the code in the error view to handle these two situat
 
  Let's see how we would implement temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.
 
+ <!-- more -->
  If you want to pass contact information based on the customer location, you will have to set it in Error View. This will couple view with domain logic, undermining MVC phiolosphy of seperation of concerns.
  
   We will develop new filters to handle these situation in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.

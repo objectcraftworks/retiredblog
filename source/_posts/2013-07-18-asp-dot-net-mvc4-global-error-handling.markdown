@@ -19,6 +19,7 @@ If you want your Error View use a master that uses ViewData/ViewBag, You will ha
 <Label>@ViewBag.Temperature</Label>&deg; 
 ``` 
 
+ <!-- more -->
 Then, we will have to set the ```ViewBag.Temperature``` somewhere.
 There are multiple ways you can set ViewData for master layouts. 
 You can set using a base controller, or in an action/result filter, or in actions. Though this is not a good practice to set it in an action for production code as this would result in duplicate code, we will set it in an action for this example.
