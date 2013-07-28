@@ -2,7 +2,7 @@
 layout: post
 author: Craftsman
 title: "ASP.NET/MVC Exception Handling Part1: Exception Handling Explained"
-date: 2013-07-18 16:07
+date: 2013-07-17 16:07
 comments: true
 categories:
  - ASP.NET/MVC4
@@ -12,8 +12,8 @@ categories:
  - ASP.NET/MVC4 Exception Handling
  
 ---
- ASP.NET MVC framework provides a mechanism to handle exceptions thrown by mvc pipeline including your actions. It's very basic. It doesn't scale very well 
-in real world situations. There are atleast two such situations I ran into.
+ ASP.NET MVC framework provides a mechanism to handle exceptions. It's very basic. It doesn't scale very well 
+in real world situations. There are atleast two such situations, I ran into.
 The framework default exception handling doesn't handle these two situations.  
 
 >  1. If you need a custom model for your Error view. 
@@ -22,10 +22,10 @@ The framework default exception handling doesn't handle these two situations.
 You will have to duplicate the code in the error view to handle these two situations. Lets see with a mockup.
  {% img /images/posts/aspdotnetmvc/exception_handling_problem.png %}
 
- Let's see how we would implement temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.
+ Let's see how we would implement the temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.
 
  <!-- more -->
- If you want to pass contact information based on the customer location, you will have to set it in Error View. This will couple view with domain logic, undermining MVC phiolosphy of seperation of concerns.
+ If you want to pass contact information based on the customer location, you will have to set it in the view. This will tightly couple the View with the domain logic, undermining MVC phiolosphy of seperation of concerns.
  
   We will develop new filters to handle these situations in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.
 
@@ -47,7 +47,7 @@ When you create a MVC project, it does two things for error handling purpose
         1. Creates an error view in shared folder (/Views/Shared/Error.cshtml)
         2. Adds HandleError filter to Global filters (/AppStart/FilterConfig.cs) 
 
-Let's first see the contents of the Error view. You would notice model type. The Framework passes HandleErrorInfo to the view.
+Let's first see the contents of the Error view. You would notice ```@model``` set to HandleErrorInfo. The Framework passes HandleErrorInfo to the view.
 
 ``` html Views/Shared/Error.cshtml 
     
@@ -66,30 +66,28 @@ Let's first see the contents of the Error view. You would notice model type. The
 Now, Let's see the contents of the FilterConfig.cs file. You would see HandleErrorAttribute filter is added to Global Filter Collection.
 
 ``` csharp AppStart/FilterConfig.cs
-
  public class FilterConfig
+ {
+    public static void RegisterGlobalFilters(GlobalFilterCollection filters)
     {
-        public static void RegisterGlobalFilters(GlobalFilterCollection filters)
-        {
-            filters.Add(new HandleErrorAttribute()); ***(2)
-        }
+       filters.Add(new HandleErrorAttribute()); 
     }
-
+ }
 ```
- To see whether default mechanism is working fine, let's throw an exception,as show below, in HomeController/Index action.
+ To see whether the default mechanism is working fine, let's throw an exception,as shown below, in the HomeController/Index action.
 
 ``` csharp Controllers/HomeController.cs
  public ActionResult Index()
-        {
-            throw new ArgumentNullException();
-            ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
+ {
+    throw new ArgumentNullException();
+    ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
 
-            return View();
-        }
+    return View();
+ }
 ```
 
 
-Now, if you haven't enabled custom errors, you just need to enable it to have mvc framework default exception mechanism to work.
+Now, if you haven't enabled custom errors, you just need to enable it in the ```Web.Config```, as shown below, to have the framework's default exception mechanism to work.
 ``` xml web.config
 <system.web>
 	  <customErrors mode="On"/> 
@@ -101,17 +99,18 @@ Now, if you haven't enabled custom errors, you just need to enable it to have mv
 {% img /images/posts/aspdotnetmvc/error_page.png Default Error Page %}
  
  Now that we saw how default exception handling works, 
-  >let's summarize the code elements we noticed. 
+  >let's summarize the code elements we noticed so far. 
 
 >* HandleError filter
  * HandleErrorInfo model for Error view
  * GlobalFilters 
  * Error view 
+
 We will briefly go through each element, and see what it does.
 
 #### HandleError filter
 
- The important code element of framework default exception handling is HandleErrorAttribute. HandleErrorAttribute is actually an exception filter. There are several types of filters in MVC framework to extend the behavior of the actions. 
+ The important code element of the framework's default exception handling is HandleErrorAttribute. HandleErrorAttribute is actually an exception filter. There are several types of filters in MVC framework to extend the behavior of the actions. 
 Exception filter is one of them. Exception filters are called when an exception is caught by the framework. 
 ``` csharp    
 public class HandleErrorAttribute : FilterAttribute, IExceptionFilter  
@@ -119,30 +118,30 @@ public class HandleErrorAttribute : FilterAttribute, IExceptionFilter
  The HandleError filter is framework's default exception filter to handle exceptions globally. This is done by adding this filter to Global filters as seen in FilterConfig.cs.
 
 ``` csharp AppStart/FilterConfig.cs
-            filters.Add(new HandleErrorAttribute()); ***(2)
+filters.Add(new HandleErrorAttribute());
 ```
  
  The basic behavior of this filter is this:
-    create a ViewResult using given View and Master
-    create a model of type HandleErrorInfo 
-    set the model on ViewData of the ViewResult
-    set the HTTP status to 500
+    creates a ViewResult using given View and Master
+    creates a model of type HandleErrorInfo 
+    sets the model on ViewData of the ViewResult
+    sets the HTTP status to 500
  
- HandleError need not to be global. You can handle exception either at an action level or at controller level. 
+ This filter need not to be global. You can handle exception either at an action level or at the controller level. 
  
  If you want to handle a particular exception differently with a custom view and/or master, You can do that too.
- For example, if you want to handle ArgumentNullException differently Index action with different error and/or master, you can do as shown below 
+ For example, if you want to handle an ArgumentNullException differently for an Index action with different error and/or master, you can do as shown below 
 
 ``` csharp  
  [HandleError(ExceptionType=typeof(ArgumentNullException),Order = 1, Master="_ErrorLayout", View="CustomError")]
  public ActionResult Index()
 ```       
 
-Now that we have seen how HandleError works, let's see next important code element
+Now that we have seen how this filter works, let's see next important code element.
 
 #### HandleErrorInfo
- 
-The model that is passed to Error view is of type HandleErrorInfo. HandleErrorInfo just have Exception that is being handled, and names of Controller and action.
+We have seen in Error.cshtml that ```@model``` is set to ```HandleErrorInfo```. 
+HandleErrorInfo has properties for the  Exception that is being handled, and names of Controller and action.
 
 #### Global filters 
  The framework defines scope and order for how the filters are called.
