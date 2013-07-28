@@ -19,6 +19,7 @@ footer: true
 * Update a package
   + <a href="#update-package-using-dialog">Using Nuget Dialog</a>
 * Managing solution wide packages
+  + <a href="#manage-solutionwide-packages-using-dialog">Using Nuget Dialog</a>
 * Install/Update a particular version of a package
 * Assembly Binding Redirect
 
@@ -113,4 +114,36 @@ In a Nutshell, To install a package using Nuget Dialog,
        * search if it's not visible in the list. 
      2. Select the package and click on update button
 
+
+<div id="manage-solutionwide-packages-using-dialog"></div>
+
+* #### Managing packages in a solution
+
+For this task, we will have to add another project. Let's go ahead and add another ASP.NET MVC 4 project. Let's call it AppAdmin.
+    
+  1. This time, let's bring up the context menu by right clicking on the solution.
+ {% img /images/tutorials/nuget/manage_packages_for_solution.png Manage packages for solution %}
+
+  2.Let's search for jQuery in the installed packages
+ {% img /images/tutorials/nuget/manage_sln_by_search_using_dialog.png Manage packages for solution %}
+  
+  3. Select jQuery version 2.0.2 and click Manage button   
+ {% img /images/tutorials/nuget/mgm_sln_update.png Manage packages for solution %}
+  
+  3. Select Projects dialog will popup for us to select/deselect projects to install/uninstall packages.   
+ {% img /images/tutorials/nuget/mgm_sln_selected_project.png Manage packages for solution %}
+ 
+  4. Let's go ahead, and select AppAdmin project. If you are expecting AppAdmin gets latest jQuery version. That's correct.
+ 
+{% img /images/tutorials/nuget/mgm_sln_after_update.png Manage packages for solution %}
+{% img /images/tutorials/nuget/mgm_sln_update_pkg_observation.png Manage packages for solution %}
+
+* #### installing a particular version of the package
+  
+{% img /images/tutorials/nuget/install_package_downgrade_pm.png Manage packages for solution %}
+
+* #### removing a package from all the projects in the solution
+ 
+{% img /images/tutorials/nuget/remove_all_projects_dialog.png Manage packages for solution %}
+{% img /images/tutorials/nuget/not_removed_package_dependencies.png Manage packages for solution %}
 
