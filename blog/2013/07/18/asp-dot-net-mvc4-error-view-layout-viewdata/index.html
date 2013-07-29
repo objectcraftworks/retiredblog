@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & its Master/Layout - Object Craftworks</title>
+  <title>ASP.NET/MVC Exception Handling Part 2: ViewData for Error View & its Master/Layout - Object Craftworks</title>
   <meta name="author" content="ObjectCraftworks.com">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">
+  <link rel="canonical" href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & Its Master/Layout</h1>
+      <h1 class="entry-title">ASP.NET/MVC Exception Handling Part 2: ViewData for Error View & Its Master/Layout</h1>
     
     
       <p class="meta">
@@ -95,7 +95,7 @@
 
 <p>If you want your Error View use a master that uses ViewData/ViewBag, You will have to set it again in Error View, which will be a duplicate code.</p>
 
-<p> Let&rsquo;s see how we can display the temperature in every page a site.
+<p> Let&rsquo;s see how we can display the temperature in every page.
  To display the temperature in every page, we will have to add to a layout as shown below.</p>
 
 <figure class='code'><figcaption><span>_Layout.cshtml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -108,7 +108,7 @@
 <p> <!-- more -->
 Then, we will have to set the <code>ViewBag.Temperature</code> somewhere.
 There are multiple ways you can set ViewData for master layouts.
-You can set using a base controller, or in an action/result filter, or in actions. Though this is not a good practice to set it in an action for production code as this would result in duplicate code, we will set it in an action for this example.</p>
+You can set using a base controller, or in an action/result filter, or in actions. We will set it in an action for this example(for production code, this is not a good practice as you will have set this data in every action).</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -121,9 +121,9 @@ You can set using a base controller, or in an action/result filter, or in action
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now you should see 67&deg; in the page, if you run it.</p>
+<p>If you run the application, You should see 67&deg; in the page.</p>
 
-<p>Now let&rsquo;s say some thing happens immediately after ViewBag.Temperature and causes an exception. Let&rsquo;s throw an exception and run the application.</p>
+<p>Now, let&rsquo;s say some thing happens immediately after <code>ViewBag.Temperature</code> and causes an exception. Let&rsquo;s throw an exception and run the application.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -140,9 +140,9 @@ You can set using a base controller, or in an action/result filter, or in action
 
 <p>The temperature wouldn&rsquo;t be displayed and would be just &deg; in the error view.</p>
 
-<p>What happened?</p>
+<p>What happened?!</p>
 
-<p> The MVC framework doesn&rsquo;t keep the viewdata/viewbag set by actions in the event of exceptions. When the framework creates the error view, it just simply sets the model of type HandleErrorInfo, which gives the Error View an access to the exception.</p>
+<p> The MVC framework doesn&rsquo;t keep the viewdata/viewbag set by the controllers. When the framework creates the error view, it just creates the ViewData object and sets the model.That&rsquo;s why <code>ViewBag.Temperature</code> is null.</p>
 
 <p>Now, let&rsquo;s see how we could solve this problem. We could set the temperature again in Error View. But that will be a duplicate code. We don&rsquo;t want to do that.</p>
 
@@ -159,40 +159,44 @@ Where do we add this code?</p>
 <blockquote><p>It turns out that ASP.NET MVC provides exception filters exactly for this reason.</p></blockquote>
 
 <p>We could write a new exception filter where we can set ViewResult&rsquo;s ViewData.
-We will have to register this filter to Global Filters. We need to make sure our filter gets called after the default filter is called.So the order of the filters is important. Make sure you add this filter before the HandleError filter.</p>
+We will have to register this filter to Global Filters. We need to make sure our filter gets called after the default filter is called.So the order of the filters is important.</p>
 
 <p>Instead of worrying about the order, we could just extend the HandleError filter, and add this filter to Global Filter.</p>
 
-<p>Let&rsquo;s see how we can extend the HandleError Filter.Let&rsquo;s call our new filter HandleErrorWithViewDataAttribute.</p>
+<p>Let&rsquo;s see how we can extend the HandleError Filter.Let&rsquo;s call our new filter <code>HandleErrorWithViewDataAttribute</code>.</p>
 
 <p>Let&rsquo;s do some simple testing before adding any code.
 To make sure Error View is getting the model, let&rsquo;s go ahead use the model in the View by accessing Exception.</p>
 
 <figure class='code'><figcaption><span>/Shared/Error.cshtml </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>   <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;redhead&quot;</span><span class="nt">&gt;</span>A minor error has occured: @Model.Exception.Message<span class="nt">&lt;/span&gt;</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;redhead&quot;</span><span class="nt">&gt;</span>A minor error has occured: @Model.Exception.Message<span class="nt">&lt;/span&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>
  and throw an exception in Index action of HomeController. If you run the application now, you should see a message.</p>
 
-<p>Now that we have something to tell us that we didn&rsquo;t break any thing. Let&rsquo;s go aahead extend the HandleError filter.</p>
+<p>Now that we have something to tell us that we didn&rsquo;t break any thing. Let&rsquo;s go ahead extend the HandleError filter.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">  [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]</span>
-</span><span class='line'> <span class="k">public</span> <span class="k">class</span> <span class="nc">HandleErrorWithViewDataAttribute</span> <span class="p">:</span> <span class="n">HandleErrorAttribute</span><span class="p">{</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, </span>
+</span><span class='line'><span class="na">                Inherited = true, </span>
+</span><span class='line'><span class="na">                AllowMultiple = true)]</span>
+</span><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">HandleErrorWithViewDataAttribute</span> <span class="p">:</span> <span class="n">HandleErrorAttribute</span><span class="p">{</span>
 </span><span class='line'>
-</span><span class='line'> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'>    <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnException</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">filterContext</span><span class="p">){</span> <span class="p">}</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnException</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">filterContext</span><span class="p">){</span> <span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -206,21 +210,16 @@ Let&rsquo;s call our code that sets ViewData on ViewResult. We will have to cast
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now, let&rsquo;s run the application to test our code.We are expecting to have an error view with the message and the temperature. But you will get a Yellow screen error page. What happened?
+<p>Now, let&rsquo;s run the application to test our code. We are expecting to have an error view with the message and the temperature. But you will get a Yellow screen error page.</p>
+
+<p>What happened?!
 If you debug the application, you will see that model in the error view is null.</p>
 
-<p>So when we set</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'>  <span class="n">result</span><span class="p">.</span><span class="n">ViewData</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Controller</span><span class="p">.</span><span class="n">ViewData</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p> , we are overriding the ViewData and the model set by the base class HandleError. That should explain why Error didn&rsquo;t receive model.</p>
+<p>So when we set <code>result.ViewData = filterContext.Controller.ViewData;</code> , we are overriding the ViewData and the model set by the base class HandleError. That should explain why Error didn&rsquo;t receive model.</p>
 
 <blockquote><p>@Model in the view is actually ViewData.Model.</p></blockquote>
 
-<p>Now instead of setting entire object, we can just add keys that don&rsquo;t exist in the ViewResult.Add following code to your filter. Make sure you remove the code tthat sets entire ViewData.</p>
+<p>Now instead of setting an entire object, we can just add keys that don&rsquo;t exist in the ViewResult. Add following code to your filter. Make sure you remove the code that sets the entire ViewData.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -229,20 +228,20 @@ If you debug the application, you will see that model in the error view is null.
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="kt">var</span> <span class="n">keysNeedToSetInView</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Controller</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="kt">var</span> <span class="n">keysToAddToView</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Controller</span>
 </span><span class='line'>             <span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">item</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">result</span><span class="p">.</span><span class="n">ViewData</span><span class="p">.</span><span class="n">ContainsKey</span><span class="p">(</span><span class="n">item</span><span class="p">.</span><span class="n">key</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'> <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">item</span> <span class="k">in</span> <span class="n">keysNeedToSetInView</span><span class="p">)</span>
-</span><span class='line'> <span class="p">{</span>
-</span><span class='line'>    <span class="n">result</span><span class="p">.</span><span class="n">ViewData</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">item</span><span class="p">);</span>
-</span><span class='line'> <span class="p">}</span>
+</span><span class='line'><span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">item</span> <span class="k">in</span> <span class="n">keysToAddToView</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">result</span><span class="p">.</span><span class="n">ViewData</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">item</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now, you should error message, and temperature when you run the appication as shown below.
+<p>Now, you should see error message, and temperature when you run the appication as shown below.
 <img src="/images/posts/aspdotnetmvc/error_layout_viewdata.png"></p>
 
-<p>You can get the full lister for the filter from Github.</p>
+<p>You can get the full listing for the filter from Github.</p>
 
 <div><script src='https://gist.github.com/6065646.js?file=HandleErrorWithViewDataAttribute.cs'></script>
 <noscript><pre><code>using System;
@@ -281,7 +280,10 @@ namespace ObjectCraftworks
 }</code></pre></noscript></div>
 
 
-<p>We override the default behavior of the HandleError filter, and set the viewdata keys on the ViewResult. This enabled us to use a master/layout for an error view.</p>
+<p> In this part, We have extended the HandleError filter to set the viewdata keys on the ViewResult. This enabled us to use a master/layout for an error view.</p>
+
+<p>sclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
+~</p>
 </div>
 
 
@@ -318,7 +320,7 @@ namespace ObjectCraftworks
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/" data-via="" data-counturl="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata/" data-via="" data-counturl="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata/" >Tweet</a>
   
   
   
@@ -353,7 +355,7 @@ namespace ObjectCraftworks
       </li>
     
       <li class="post">
-        <a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & its Master/Layout</a>
+        <a href="/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata/">ASP.NET/MVC Exception Handling Part 2: ViewData for Error View & its Master/Layout</a>
       </li>
     
       <li class="post">

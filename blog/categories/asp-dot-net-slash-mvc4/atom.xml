@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ASP.NET/MVC4 | Object Craftworks]]></title>
   <link href="http://objectcraftworks.github.io/blog/categories/asp-dot-net-slash-mvc4/atom.xml" rel="self"/>
   <link href="http://objectcraftworks.github.io/"/>
-  <updated>2013-07-28T19:17:53-04:00</updated>
+  <updated>2013-07-28T20:41:01-04:00</updated>
   <id>http://objectcraftworks.github.io/</id>
   <author>
     <name><![CDATA[ObjectCraftworks.com]]></name>
@@ -18,22 +18,26 @@
     <link href="http://objectcraftworks.github.io/blog/2013/07/24/asp-dot-net-mvc-viewdata-provider-for-error-view/"/>
     <updated>2013-07-24T16:07:00-04:00</updated>
     <id>http://objectcraftworks.github.io/blog/2013/07/24/asp-dot-net-mvc-viewdata-provider-for-error-view</id>
-    <content type="html"><![CDATA[<p> As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View.  We have seen in <a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling">part2</a> and <a href="/blog/2013/07/23/custom-model-for-errorview">part3</a>, how we can extend default exception filter to keep the viewdata items set by controller and to use custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use ideas from previous parts.</p>
+    <content type="html"><![CDATA[<p> As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View. Also, We have seen in <a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling">part2</a> and <a href="/blog/2013/07/23/custom-model-for-errorview">part3</a>, how we can extend the default exception filter to keep the viewdata items set by controller and to use a custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use the techniques covered so far.</p>
 
 <p> <!-- more --></p>
 
-<p>  The MVC framework keeps the model in a dictionary called ViewDataDictionary.
+<p>  The MVC framework keeps the model in a dictionary called <code>ViewDataDictionary</code>.
 You can add view specific data as items to the dictionary.
-You can either directly access this items as you would in a dictionary, or use ViewBag, a dynamic object, which gives the items in the dictionary as properties.</p>
+You can either directly access these items as you would in a dictionary, or use ViewBag, a dynamic object, which gives the items in the dictionary as properties.</p>
 
-<p>  ViewData items and its model property actually constitutes ViewData/ViewModel for the view.  So instead of justi having custom model &amp; model provider, we will extend the default filter to take ViewDataProvider. This will allow to extend not only for the model but also the view data items if any needed.</p>
+<p>  ViewData items and its model property actually constitutes ViewData/ViewModel for the view.  So instead of just having custom model &amp; model provider, we will extend the default filter to take ViewDataProvider. This will allow us set not only custom model, but also view data items.</p>
 
-<p><code>csharp   
-  [HandleErrorWithCustomViewData(View="ErrorWithCustomModel", ViewDataProvider=typeof(ErrorViewDataProvider))]
-</code></p>
+<p>``` csharp <br/>
+[HandleErrorWithCustomViewData(View=&ldquo;ErrorWithCustomModel&rdquo;,</p>
 
-<p>  Now we need define a contract for ViewDataProvider.
-As Filter has two items it can pass to this model provider: ErrorContext, and the default model it creates. Let&rsquo;s define the signature</p>
+<pre><code>                           ViewDataProvider=typeof(ErrorViewDataProvider))]
+</code></pre>
+
+<p>```</p>
+
+<p>  Now, we need to define a contract for ViewDataProvider.
+As Filter has in its hand: ErrorContext, and the default model it creates. Lets make them available to our custom view data provider. Let&rsquo;s define the signature,as shown below.</p>
 
 <p>``` csharp contract
 public interface IErrorViewDataProvider
@@ -47,97 +51,99 @@ public interface IErrorViewDataProvider
 
 <p>We can implement it as shown below. This particular implementation uses a custom model, and adds the view data items from the controller.</p>
 
-<p>``` csharp implementation
-public class ErrorViewDataProvider : IErrorViewDataProvider</p>
+<p>``` csharp ErrorViewDataProvider.cs
+public class ErrorViewDataProvider : IErrorViewDataProvider
+{</p>
 
-<pre><code>{
-    public ViewDataDictionary GetViewData(ExceptionContext context, HandleErrorInfo defaultModel)
-    {
-        var model = GetModel(context, defaultModel);
-        var viewData = new ViewDataDictionary(model);
-        AddControllerViewDataItemsToView(context.Controller.ViewData, viewData);
-        return viewData;
-    }
-
-    private void AddControllerViewDataItemsToView(ViewDataDictionary controllerViewData, ViewDataDictionary viewViewData)
-    {
-        var itemsToAdd = controllerViewData
-                                        .Where(item =&gt; !viewViewData.ContainsKey(item.Key));
-        foreach (var item in itemsToAdd)
-        {
-            viewViewData.Add(item);
-        }
-    }
-
-    object GetModel(ExceptionContext context, HandleErrorInfo defaultModel)
-    {
-        return new CustomModel
-            {
-                Exception = context.Exception,
-                SupportInfo = GetSupportInfo(context)
-            };
-    }
-
-    SupportInfo GetSupportInfo(ExceptionContext context)
-    {
-        //You can load it from external source using the available context
-        return new SupportInfo
-            {
-                ContactNo = "1800Support"
-            };
-    }
-}
-</code></pre>
-
-<p>```
- Now that we have custom model, let&rsquo;s extend the default filter to use this model.</p>
-
-<p>``` csharp
- [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]</p>
-
-<pre><code>public class HandleErrorWithCustomViewDataAttribute : HandleErrorAttribute
+<pre><code>public ViewDataDictionary GetViewData(ExceptionContext context, HandleErrorInfo defaultModel)
 {
-    public Type ViewDataProvider { get; set; }
+    var model = GetModel(context, defaultModel);
+    var viewData = new ViewDataDictionary(model);
+    AddControllerViewDataItemsToView(context.Controller.ViewData, viewData);
+    return viewData;
+}
 
-    public override void OnException(ExceptionContext filterContext)
+private void AddControllerViewDataItemsToView(ViewDataDictionary controllerViewData, ViewDataDictionary viewViewData)
+{
+    var itemsToAdd = controllerViewData
+                                    .Where(item =&gt; !viewViewData.ContainsKey(item.Key));
+    foreach (var item in itemsToAdd)
     {
-        if (filterContext.ExceptionHandled == true)
-            return;
-        base.OnException(filterContext);
-
-        if (filterContext.ExceptionHandled == false)
-            return;
-
-        var result = filterContext.Result as ViewResult;
-        if (result == null)
-            return;
-        var modelProvider = Activator.CreateInstance(ViewDataProvider) as IErrorViewDataProvider;
-        if (modelProvider == null)
-            return;
-        result.ViewData = modelProvider.GetViewData(filterContext, result.Model as HandleErrorInfo);
+        viewViewData.Add(item);
     }
 }
+
+object GetModel(ExceptionContext context, HandleErrorInfo defaultModel)
+{
+    return new CustomModel
+    {
+        Exception = context.Exception,
+        SupportInfo = GetSupportInfo(context)
+    };
+}
+
+SupportInfo GetSupportInfo(ExceptionContext context)
+{
+    //You can load it from external source using the available context
+    return new SupportInfo
+    {
+       ContactNo = "1800Support"
+    };
+}
 </code></pre>
+
+<p>}
+```
+Now that we have a viewdata provider, let&rsquo;s extend the default filter to use this this provider.</p>
+
+<p>``` csharp HandleErrorWithCustomViewDataAttribute.cs
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+public class HandleErrorWithCustomViewDataAttribute : HandleErrorAttribute
+{</p>
+
+<pre><code>public Type ViewDataProvider { get; set; }
+
+public override void OnException(ExceptionContext filterContext)
+{
+    if (filterContext.ExceptionHandled == true)
+        return;
+    base.OnException(filterContext);
+
+    if (filterContext.ExceptionHandled == false)
+        return;
+
+    var result = filterContext.Result as ViewResult;
+    if (result == null)
+        return;
+    var viewDataProvider = Activator.CreateInstance(ViewDataProvider) as IErrorViewDataProvider;
+    if (viewDataProvider == null)
+        return;
+    result.ViewData = viewDataProvider.GetViewData(filterContext, result.Model as HandleErrorInfo);
+}
+</code></pre>
+
+<p>}</p>
 
 <p>```</p>
 
 <p>Let&rsquo;s add this filter to Home/Index as shown below.</p>
 
-<p>```  csharp HomeController.cs</p>
+<p>```  csharp HomeController.cs
+HandleErrorWithCustomViewData(View=&ldquo;ErrorWithCustomModel&rdquo;,</p>
 
-<pre><code>  ndleErrorWithCustomViewData(View="ErrorWithCustomModel", ViewDataProvider = typeof(ErrorViewDataProvider))]
+<pre><code>                          ViewDataProvider = typeof(ErrorViewDataProvider))]
 </code></pre>
 
-<p> public ActionResult Index()</p>
+<p>public ActionResult Index()
+{</p>
 
-<pre><code>    {
-        ViewBag.Temperature = "67";
-        throw new ArgumentNullException();
-        ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
-        return View();
+<pre><code> ViewBag.Temperature = "67";
+ throw new ArgumentNullException();
+ ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
+return View();
 </code></pre>
 
-<p>  }
+<p>}
 ```</p>
 
 <p>if you run the application now, you should see Custom Error View with custom model, displaying ContactNo correctly from model.</p>
@@ -150,9 +156,11 @@ public class ErrorViewDataProvider : IErrorViewDataProvider</p>
 <li>In Part1, We covered the default exception handling mechanism</li>
 <li>In Part2, We extended default error filter to pass the View Data items set by a controller to Error View</li>
 <li>In Part3, We wrote an exception filter by extending the default filter to use Custom model and set the model for the error view.</li>
-<li>In Part4, We extended what we will learned so far, and provided a way to set the custom view data provider for the error view.</li>
+<li>In Part4, We extended what learned so far, and provided a way to set the custom view data provider for the error view.</li>
 </ul>
 </blockquote>
+
+<p>Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.</p>
 ]]></content>
   </entry>
   
@@ -175,21 +183,18 @@ and passes to the Error View.
 Let&rsquo;s do this with our example of displaying customer contact information based on the context. This context could vary on things such customer location, type of error, or customer serving system, tech support etc.
 Let&rsquo;s define a model for this.</p>
 
-<p>``` csharp CustomModel</p>
-
-<pre><code>public class CustomModel
+<p>``` csharp CustomModel
+public class CustomModel
 {
-    public Exception Exception { get; set; }
-    public SupportInfo SupportInfo { get; set; }
-}
+   public Exception Exception { get; set; }
+   public SupportInfo SupportInfo { get; set; }
+}</p>
 
-public class SupportInfo
+<p>public class SupportInfo
 {
    public string ContactNo{get;set;}
 }
-</code></pre>
-
-<p>```
+```
 Let&rsquo;s see how we would have done if it were happy path views.
 We would</p>
 
@@ -203,16 +208,16 @@ We would</p>
 
 <p>When we do above steps, the code would look as shown below.</p>
 
-<p>``` csharp</p>
+<p>``` csharp
+public ActionResult SomeAction() {</p>
 
-<pre><code>public ActionResult SomeAction() {
- //controller context
- var supportInfo = GetSupportInfo(ControllerContext);//a call to either your repo, or service
- return View(supportInfo);//which sets the model on the view
-}
+<pre><code> //controller context
 </code></pre>
 
-<p>```
+<p>   var supportInfo = GetSupportInfo(ControllerContext);//a call to either your repo, or service
+   return View(supportInfo);//which sets the model on the view
+}
+```
   That&rsquo;s a clean separation of concerns, of course the beauty of this code structure is coming from MVC pattern.</p>
 
 <p>  We would expect same thing happening even for Error Views. But that&rsquo;s not the case. The framework handles error views differently. It sets the model and doesn&rsquo;t carry the ViewData set in Controller/Actions.</p>
@@ -223,20 +228,17 @@ We would</p>
  if we define model for our customer support information,
   <code>SupportInfo</code>,
    We need to LoadSupportInfo, and set that as a model, similar to what we would normally do for happy path views.
-``` csharp</p>
-
-<pre><code>//controller context
+<code>csharp
+//controller context
 var supportInfo = GetSupportInfo(ControllerContext);
 ViewResult.ViewData.Model = supportInfo;
-</code></pre>
-
-<p>```</p>
+</code></p>
 
 <p>It turns out that we can this by extending HandleError filter.
    HandleError allows you specify error(default is Error.cshtml) or master/layout for your error view. Here is how you can specify different error, and layout.</p>
 
 <p><code>csharp   
-  [HandleError(Master="_ErrorLayout", View="ErrorWithCustomModel")]
+[HandleError(Master="_ErrorLayout", View="ErrorWithCustomModel")]
 </code> <br/>
   This is a good thing that HandleError allows custom views and layouts, but not custom model.</p>
 
@@ -245,105 +247,100 @@ The filter should call our code that loads the data and sets the model on view.
 We are essentially providing a model to the framework. So we can add a new property to filter, we can call it ModelProvider.</p>
 
 <p><code>csharp   
-  [HandleErrorWithCustomModel(View="ErrorWithCustomModel", ModelProvider=typeof(ErrorModelProvider))]
+[HandleErrorWithCustomModel(View="ErrorWithCustomModel", ModelProvider=typeof(ErrorModelProvider))]
 </code></p>
 
 <p>  Now we need define a contract for ModelProvider.
 As Filter has two items it can pass to this model provider: ErrorContext, and the default model it creates. Let&rsquo;s define the signature</p>
 
-<p>``` csharp contract
-public interface IErrorModelProvider</p>
-
-<pre><code>{
-    object GetModel(ExceptionContext context, HandleErrorInfo defaultModel);
+<p><code>csharp contract
+public interface IErrorModelProvider
+{
+   object GetModel(ExceptionContext context, HandleErrorInfo defaultModel);
 }
-</code></pre>
-
-<p>```</p>
+</code></p>
 
 <p>We can implement it as shown below.</p>
 
-<p>``` csharp implementation</p>
+<p>``` csharp
+public class ErrorModelProvider : IErrorModelProvider
+{</p>
 
-<pre><code>public class ErrorModelProvider :IErrorModelProvider
+<pre><code>public object GetModel(ExceptionContext context, HandleErrorInfo defaultModel)
 {
-    public object GetModel(ExceptionContext context, HandleErrorInfo defaultModel)
+    return new CustomModel
     {
-        return new CustomModel
-            {
-               Exception = context.Exception,
-               SupportInfo = GetSupportInfo(context) 
-           };
-    }
-    SupportInfo GetSupportInfo(ExceptionContext context){
-     return new SupportInfo{ 
-          ContactNo = "1800SUPPORT"; 
-       };// or you can load it from external source
-    }
+        Exception = context.Exception,
+        SupportInfo = GetSupportInfo(context)
+    };
 }
+SupportInfo GetSupportInfo(ExceptionContext context){
+     return new SupportInfo{
+          ContactNo = "1800SUPPORT";
+       };// or you can load it from an external source
+    }
 </code></pre>
 
-<p>```
- Now that we have custom model, let&rsquo;s extend the default filter to use this model.</p>
+<p>}
+```
+ Now that we have a custom model, let&rsquo;s extend the default filter to use this model.</p>
 
 <p>``` csharp
-   [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]</p>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+public class HandleErrorWithCustomModelAttribute : HandleErrorAttribute
+{</p>
 
-<pre><code>public class HandleErrorWithCustomModelAttribute : HandleErrorAttribute
+<pre><code>public Type ModelProvider { get; set; }
+
+public override void OnException(ExceptionContext filterContext)
 {
-    public Type ModelProvider { get; set; }
-
-    public override void OnException(ExceptionContext filterContext)
-    {
-        base.OnException(filterContext);
-        var result = filterContext.Result as ViewResult;
-        var modelProvider = Activator.CreateInstance(ModelProvider) as IErrorModelProvider;
-        var model = modelProvider.GetModel(filterContext, result.Model as HandleErrorInfo);
-        result.ViewData = new ViewDataDictionary(model);
-        //If you need ViewData set by controller, You can add items of Controller.ViewData to View's ViewData.
-    }
+    base.OnException(filterContext);
+    var result = filterContext.Result as ViewResult;
+    var modelProvider = Activator.CreateInstance(ModelProvider) as IErrorModelProvider;
+    var model = modelProvider.GetModel(filterContext, result.Model as HandleErrorInfo);
+    result.ViewData = new ViewDataDictionary(model);
+    //If you need ViewData set by controller, You can add items of Controller.ViewData to View's ViewData.
 }
 </code></pre>
 
-<p>```</p>
+<p>}
+```</p>
 
 <p>Let&rsquo;s add this filter to Home/Index as shown below.</p>
 
-<p>```  csharp HomeController.cs</p>
-
-<p>  [HandleErrorWithCustomModel(View=&ldquo;ErrorWithCustomModel&rdquo;, ModelProvider = typeof(ErrorModelProvider))]</p>
-
-<p> public ActionResult Index()</p>
-
-<pre><code>    {
-        ViewBag.Temperature = "67";
-        throw new ArgumentNullException();
-        ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
-        return View();
-</code></pre>
-
-<p>  }
-```</p>
+<p><code> csharp HomeController.cs
+[HandleErrorWithCustomModel(View="ErrorWithCustomModel", ModelProvider = typeof(ErrorModelProvider))]
+public ActionResult Index()
+{
+   ViewBag.Temperature = "67";
+   throw new ArgumentNullException();
+   ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
+   return View();
+}
+</code></p>
 
 <p>if you run the application now, you should see Custom Error View with custom model, displaying ContactNo correctly from model.</p>
 
 <p><img src="/images/posts/aspdotnetmvc/error_custom_model.png"></p>
 
-<p>  In this part, we have seen how to extend the default exception filter to use custom models.</p>
+<p>  In this part, we have seen how to extend the default exception filter to use a custom model for an error view.</p>
+
+<p>Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
+~</p>
 ]]></content>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & its Master/Layout]]></title>
-    <link href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/"/>
+    <title type="html"><![CDATA[ASP.NET/MVC Exception Handling Part 2: ViewData for Error View & its Master/Layout]]></title>
+    <link href="http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata/"/>
     <updated>2013-07-18T16:07:00-04:00</updated>
-    <id>http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling</id>
+    <id>http://objectcraftworks.github.io/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata</id>
     <content type="html"><![CDATA[<p>   In <a href="/blog/2013/07/18/asp-dot-net-exception-handling-explained">Part1</a> of this article, we covered default exception handling of the ASP.NET/MVC framework.
    In this part, We will see how to keep the view data set by the controller for error view and master/layout.</p>
 
 <p>If you want your Error View use a master that uses ViewData/ViewBag, You will have to set it again in Error View, which will be a duplicate code.</p>
 
-<p> Let&rsquo;s see how we can display the temperature in every page a site.
+<p> Let&rsquo;s see how we can display the temperature in every page.
  To display the temperature in every page, we will have to add to a layout as shown below.</p>
 
 <p><code>html _Layout.cshtml
@@ -353,16 +350,16 @@ public interface IErrorModelProvider</p>
 <p> <!-- more -->
 Then, we will have to set the <code>ViewBag.Temperature</code> somewhere.
 There are multiple ways you can set ViewData for master layouts.
-You can set using a base controller, or in an action/result filter, or in actions. Though this is not a good practice to set it in an action for production code as this would result in duplicate code, we will set it in an action for this example.
+You can set using a base controller, or in an action/result filter, or in actions. We will set it in an action for this example(for production code, this is not a good practice as you will have set this data in every action).
 <code>csharp
  public ActionResult Index() {
   ViewBag.Temperature = "67";
   return View();
  }
 </code>
-Now you should see 67&deg; in the page, if you run it.</p>
+If you run the application, You should see 67&deg; in the page.</p>
 
-<p>Now let&rsquo;s say some thing happens immediately after ViewBag.Temperature and causes an exception. Let&rsquo;s throw an exception and run the application.</p>
+<p>Now, let&rsquo;s say some thing happens immediately after <code>ViewBag.Temperature</code> and causes an exception. Let&rsquo;s throw an exception and run the application.</p>
 
 <p><code>csharp
  public ActionResult Index() {
@@ -374,9 +371,9 @@ Now you should see 67&deg; in the page, if you run it.</p>
 
 <p>The temperature wouldn&rsquo;t be displayed and would be just &deg; in the error view.</p>
 
-<p>What happened?</p>
+<p>What happened?!</p>
 
-<p> The MVC framework doesn&rsquo;t keep the viewdata/viewbag set by actions in the event of exceptions. When the framework creates the error view, it just simply sets the model of type HandleErrorInfo, which gives the Error View an access to the exception.</p>
+<p> The MVC framework doesn&rsquo;t keep the viewdata/viewbag set by the controllers. When the framework creates the error view, it just creates the ViewData object and sets the model.That&rsquo;s why <code>ViewBag.Temperature</code> is null.</p>
 
 <p>Now, let&rsquo;s see how we could solve this problem. We could set the temperature again in Error View. But that will be a duplicate code. We don&rsquo;t want to do that.</p>
 
@@ -390,75 +387,70 @@ Where do we add this code?</p>
 <blockquote><p>It turns out that ASP.NET MVC provides exception filters exactly for this reason.</p></blockquote>
 
 <p>We could write a new exception filter where we can set ViewResult&rsquo;s ViewData.
-We will have to register this filter to Global Filters. We need to make sure our filter gets called after the default filter is called.So the order of the filters is important. Make sure you add this filter before the HandleError filter.</p>
+We will have to register this filter to Global Filters. We need to make sure our filter gets called after the default filter is called.So the order of the filters is important.</p>
 
 <p>Instead of worrying about the order, we could just extend the HandleError filter, and add this filter to Global Filter.</p>
 
-<p>Let&rsquo;s see how we can extend the HandleError Filter.Let&rsquo;s call our new filter HandleErrorWithViewDataAttribute.</p>
+<p>Let&rsquo;s see how we can extend the HandleError Filter.Let&rsquo;s call our new filter <code>HandleErrorWithViewDataAttribute</code>.</p>
 
 <p>Let&rsquo;s do some simple testing before adding any code.
 To make sure Error View is getting the model, let&rsquo;s go ahead use the model in the View by accessing Exception.</p>
 
 <p><code>html /Shared/Error.cshtml
-   &lt;span class="redhead"&gt;A minor error has occured: @Model.Exception.Message&lt;/span&gt;
+&lt;span class="redhead"&gt;A minor error has occured: @Model.Exception.Message&lt;/span&gt;
 </code>
  and throw an exception in Index action of HomeController. If you run the application now, you should see a message.</p>
 
-<p>Now that we have something to tell us that we didn&rsquo;t break any thing. Let&rsquo;s go aahead extend the HandleError filter.</p>
+<p>Now that we have something to tell us that we didn&rsquo;t break any thing. Let&rsquo;s go ahead extend the HandleError filter.</p>
 
 <p>``` csharp
-  [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
- public class HandleErrorWithViewDataAttribute : HandleErrorAttribute{</p>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method,</p>
 
-<p> }
+<pre><code>            Inherited = true, 
+            AllowMultiple = true)]
+</code></pre>
+
+<p>public class HandleErrorWithViewDataAttribute : HandleErrorAttribute{</p>
+
+<p>}
 ```</p>
 
-<p>``` csharp</p>
-
-<pre><code>    public override void OnException(ExceptionContext filterContext){ }
-</code></pre>
-
-<p>```
+<p><code>csharp
+public override void OnException(ExceptionContext filterContext){ }
+</code>
 Let&rsquo;s call our code that sets ViewData on ViewResult. We will have to cast Result to ViewResult type.</p>
 
-<p>``` csharp</p>
-
-<pre><code>var result = filterContext.Result as ViewResult;
+<p><code>csharp
+var result = filterContext.Result as ViewResult;
 result.ViewData = filterContext.Controller.ViewData;
-</code></pre>
+</code></p>
 
-<p>```</p>
+<p>Now, let&rsquo;s run the application to test our code. We are expecting to have an error view with the message and the temperature. But you will get a Yellow screen error page.</p>
 
-<p>Now, let&rsquo;s run the application to test our code.We are expecting to have an error view with the message and the temperature. But you will get a Yellow screen error page. What happened?
+<p>What happened?!
 If you debug the application, you will see that model in the error view is null.</p>
 
-<p>So when we set
-<code>
-  result.ViewData = filterContext.Controller.ViewData;
-</code> , we are overriding the ViewData and the model set by the base class HandleError. That should explain why Error didn&rsquo;t receive model.</p>
+<p>So when we set <code>result.ViewData = filterContext.Controller.ViewData;</code> , we are overriding the ViewData and the model set by the base class HandleError. That should explain why Error didn&rsquo;t receive model.</p>
 
 <blockquote><p>@Model in the view is actually ViewData.Model.</p></blockquote>
 
-<p>Now instead of setting entire object, we can just add keys that don&rsquo;t exist in the ViewResult.Add following code to your filter. Make sure you remove the code tthat sets entire ViewData.</p>
+<p>Now instead of setting an entire object, we can just add keys that don&rsquo;t exist in the ViewResult. Add following code to your filter. Make sure you remove the code that sets the entire ViewData.</p>
 
 <p>``` csharp
- var keysNeedToSetInView = filterContext.Controller</p>
+var keysToAddToView = filterContext.Controller</p>
 
 <pre><code>         .Where(item =&gt; !result.ViewData.ContainsKey(item.key);
 </code></pre>
 
-<p> foreach (var item in keysNeedToSetInView)
- {</p>
-
-<pre><code>result.ViewData.Add(item);
-</code></pre>
-
-<p> }
+<p>foreach (var item in keysToAddToView)
+{
+  result.ViewData.Add(item);
+}
 ```
-Now, you should error message, and temperature when you run the appication as shown below.
+Now, you should see error message, and temperature when you run the appication as shown below.
 <img src="/images/posts/aspdotnetmvc/error_layout_viewdata.png"></p>
 
-<p>You can get the full lister for the filter from Github.
+<p>You can get the full listing for the filter from Github.
 <div><script src='https://gist.github.com/6065646.js?file=HandleErrorWithViewDataAttribute.cs'></script>
 <noscript><pre><code>using System;
 using System.Linq;
@@ -496,7 +488,10 @@ namespace ObjectCraftworks
 }</code></pre></noscript></div>
 </p>
 
-<p>We override the default behavior of the HandleError filter, and set the viewdata keys on the ViewResult. This enabled us to use a master/layout for an error view.</p>
+<p> In this part, We have extended the HandleError filter to set the viewdata keys on the ViewResult. This enabled us to use a master/layout for an error view.</p>
+
+<p>sclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
+~</p>
 ]]></content>
   </entry>
   
@@ -676,6 +671,9 @@ HandleErrorInfo model for Error View
 Global Filters to handle exceptions globally
 An error view 
 </code></pre></blockquote>
+
+<p>Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
+~</p>
 ]]></content>
   </entry>
   

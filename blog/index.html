@@ -91,7 +91,7 @@
   </header>
 
 
-  <div class="entry-content"><p> As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View.  We have seen in <a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling">part2</a> and <a href="/blog/2013/07/23/custom-model-for-errorview">part3</a>, how we can extend default exception filter to keep the viewdata items set by controller and to use custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use ideas from previous parts.</p>
+  <div class="entry-content"><p> As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View. Also, We have seen in <a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling">part2</a> and <a href="/blog/2013/07/23/custom-model-for-errorview">part3</a>, how we can extend the default exception filter to keep the viewdata items set by controller and to use a custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use the techniques covered so far.</p>
 
 <p> </div>
   
@@ -154,7 +154,7 @@ and passes to the Error View.
     <article class="post">
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & Its Master/Layout</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata/">ASP.NET/MVC Exception Handling Part 2: ViewData for Error View & Its Master/Layout</a></h1>
     
     
       <p class="meta">
@@ -182,7 +182,7 @@ and passes to the Error View.
 
 <p>If you want your Error View use a master that uses ViewData/ViewBag, You will have to set it again in Error View, which will be a duplicate code.</p>
 
-<p> Let&rsquo;s see how we can display the temperature in every page a site.
+<p> Let&rsquo;s see how we can display the temperature in every page.
  To display the temperature in every page, we will have to add to a layout as shown below.</p>
 
 <figure class='code'><figcaption><span>_Layout.cshtml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -196,7 +196,7 @@ and passes to the Error View.
   
   
     <footer>
-      <a rel="full-article" href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata/">Read on &rarr;</a>
     </footer>
   
 

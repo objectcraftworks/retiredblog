@@ -4,7 +4,7 @@
   <title><![CDATA[Category: MVC | Object Craftworks]]></title>
   <link href="http://objectcraftworks.github.io/blog/categories/mvc/atom.xml" rel="self"/>
   <link href="http://objectcraftworks.github.io/"/>
-  <updated>2013-07-28T19:17:53-04:00</updated>
+  <updated>2013-07-28T20:41:01-04:00</updated>
   <id>http://objectcraftworks.github.io/</id>
   <author>
     <name><![CDATA[ObjectCraftworks.com]]></name>
@@ -189,6 +189,9 @@ HandleErrorInfo model for Error View
 Global Filters to handle exceptions globally
 An error view 
 </code></pre></blockquote>
+
+<p>Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
+~</p>
 ]]></content>
   </entry>
   

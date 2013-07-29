@@ -117,8 +117,8 @@ Let&rsquo;s define a model for this.</p>
 <span class='line-number'>10</span>
 </pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">CustomModel</span>
 </span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="k">public</span> <span class="n">Exception</span> <span class="n">Exception</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>    <span class="k">public</span> <span class="n">SupportInfo</span> <span class="n">SupportInfo</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>   <span class="k">public</span> <span class="n">Exception</span> <span class="n">Exception</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>   <span class="k">public</span> <span class="n">SupportInfo</span> <span class="n">SupportInfo</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">SupportInfo</span>
@@ -147,9 +147,9 @@ We would</p>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 </pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">SomeAction</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'> <span class="c1">//controller context</span>
-</span><span class='line'> <span class="kt">var</span> <span class="n">supportInfo</span> <span class="p">=</span> <span class="n">GetSupportInfo</span><span class="p">(</span><span class="n">ControllerContext</span><span class="p">);</span><span class="c1">//a call to either your repo, or service</span>
-</span><span class='line'> <span class="k">return</span> <span class="nf">View</span><span class="p">(</span><span class="n">supportInfo</span><span class="p">);</span><span class="c1">//which sets the model on the view</span>
+</span><span class='line'>     <span class="c1">//controller context</span>
+</span><span class='line'>   <span class="kt">var</span> <span class="n">supportInfo</span> <span class="p">=</span> <span class="n">GetSupportInfo</span><span class="p">(</span><span class="n">ControllerContext</span><span class="p">);</span><span class="c1">//a call to either your repo, or service</span>
+</span><span class='line'>   <span class="k">return</span> <span class="nf">View</span><span class="p">(</span><span class="n">supportInfo</span><span class="p">);</span><span class="c1">//which sets the model on the view</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -181,7 +181,7 @@ We would</p>
    HandleError allows you specify error(default is Error.cshtml) or master/layout for your error view. Here is how you can specify different error, and layout.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">  [HandleError(Master=&quot;_ErrorLayout&quot;, View=&quot;ErrorWithCustomModel&quot;)]</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">[HandleError(Master=&quot;_ErrorLayout&quot;, View=&quot;ErrorWithCustomModel&quot;)]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -193,7 +193,7 @@ The filter should call our code that loads the data and sets the model on view.
 We are essentially providing a model to the framework. So we can add a new property to filter, we can call it ModelProvider.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">  [HandleErrorWithCustomModel(View=&quot;ErrorWithCustomModel&quot;, ModelProvider=typeof(ErrorModelProvider))]</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">[HandleErrorWithCustomModel(View=&quot;ErrorWithCustomModel&quot;, ModelProvider=typeof(ErrorModelProvider))]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -205,15 +205,15 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 </pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">interface</span> <span class="n">IErrorModelProvider</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="kt">object</span> <span class="nf">GetModel</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">,</span> <span class="n">HandleErrorInfo</span> <span class="n">defaultModel</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>   <span class="kt">object</span> <span class="nf">GetModel</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">,</span> <span class="n">HandleErrorInfo</span> <span class="n">defaultModel</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>We can implement it as shown below.</p>
 
-<figure class='code'><figcaption><span>implementation </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -229,26 +229,26 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">ErrorModelProvider</span> <span class="p">:</span><span class="n">IErrorModelProvider</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">ErrorModelProvider</span> <span class="p">:</span> <span class="n">IErrorModelProvider</span>
 </span><span class='line'><span class="p">{</span>
 </span><span class='line'>    <span class="k">public</span> <span class="kt">object</span> <span class="nf">GetModel</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">,</span> <span class="n">HandleErrorInfo</span> <span class="n">defaultModel</span><span class="p">)</span>
 </span><span class='line'>    <span class="p">{</span>
 </span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="n">CustomModel</span>
-</span><span class='line'>            <span class="p">{</span>
-</span><span class='line'>               <span class="n">Exception</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">Exception</span><span class="p">,</span>
-</span><span class='line'>               <span class="n">SupportInfo</span> <span class="p">=</span> <span class="n">GetSupportInfo</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>           <span class="p">};</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="n">Exception</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">Exception</span><span class="p">,</span>
+</span><span class='line'>            <span class="n">SupportInfo</span> <span class="p">=</span> <span class="n">GetSupportInfo</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">};</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'>    <span class="n">SupportInfo</span> <span class="nf">GetSupportInfo</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">context</span><span class="p">){</span>
-</span><span class='line'>     <span class="k">return</span> <span class="k">new</span> <span class="n">SupportInfo</span><span class="p">{</span>
-</span><span class='line'>          <span class="n">ContactNo</span> <span class="p">=</span> <span class="s">&quot;1800SUPPORT&quot;</span><span class="p">;</span>
-</span><span class='line'>       <span class="p">};</span><span class="c1">// or you can load it from external source</span>
-</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>         <span class="k">return</span> <span class="k">new</span> <span class="n">SupportInfo</span><span class="p">{</span>
+</span><span class='line'>              <span class="n">ContactNo</span> <span class="p">=</span> <span class="s">&quot;1800SUPPORT&quot;</span><span class="p">;</span>
+</span><span class='line'>           <span class="p">};</span><span class="c1">// or you can load it from an external source</span>
+</span><span class='line'>        <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> Now that we have custom model, let&rsquo;s extend the default filter to use this model.</p>
+<p> Now that we have a custom model, let&rsquo;s extend the default filter to use this model.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -265,21 +265,21 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">   [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]</span>
-</span><span class='line'>    <span class="k">public</span> <span class="k">class</span> <span class="nc">HandleErrorWithCustomModelAttribute</span> <span class="p">:</span> <span class="n">HandleErrorAttribute</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">public</span> <span class="n">Type</span> <span class="n">ModelProvider</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]</span>
+</span><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">HandleErrorWithCustomModelAttribute</span> <span class="p">:</span> <span class="n">HandleErrorAttribute</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">public</span> <span class="n">Type</span> <span class="n">ModelProvider</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>        <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnException</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">filterContext</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="k">base</span><span class="p">.</span><span class="n">OnException</span><span class="p">(</span><span class="n">filterContext</span><span class="p">);</span>
-</span><span class='line'>            <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Result</span> <span class="k">as</span> <span class="n">ViewResult</span><span class="p">;</span>
-</span><span class='line'>            <span class="kt">var</span> <span class="n">modelProvider</span> <span class="p">=</span> <span class="n">Activator</span><span class="p">.</span><span class="n">CreateInstance</span><span class="p">(</span><span class="n">ModelProvider</span><span class="p">)</span> <span class="k">as</span> <span class="n">IErrorModelProvider</span><span class="p">;</span>
-</span><span class='line'>            <span class="kt">var</span> <span class="n">model</span> <span class="p">=</span> <span class="n">modelProvider</span><span class="p">.</span><span class="n">GetModel</span><span class="p">(</span><span class="n">filterContext</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">Model</span> <span class="k">as</span> <span class="n">HandleErrorInfo</span><span class="p">);</span>
-</span><span class='line'>            <span class="n">result</span><span class="p">.</span><span class="n">ViewData</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ViewDataDictionary</span><span class="p">(</span><span class="n">model</span><span class="p">);</span>
-</span><span class='line'>            <span class="c1">//If you need ViewData set by controller, You can add items of Controller.ViewData to View&#39;s ViewData.</span>
-</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnException</span><span class="p">(</span><span class="n">ExceptionContext</span> <span class="n">filterContext</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">base</span><span class="p">.</span><span class="n">OnException</span><span class="p">(</span><span class="n">filterContext</span><span class="p">);</span>
+</span><span class='line'>        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">Result</span> <span class="k">as</span> <span class="n">ViewResult</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">var</span> <span class="n">modelProvider</span> <span class="p">=</span> <span class="n">Activator</span><span class="p">.</span><span class="n">CreateInstance</span><span class="p">(</span><span class="n">ModelProvider</span><span class="p">)</span> <span class="k">as</span> <span class="n">IErrorModelProvider</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">var</span> <span class="n">model</span> <span class="p">=</span> <span class="n">modelProvider</span><span class="p">.</span><span class="n">GetModel</span><span class="p">(</span><span class="n">filterContext</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">Model</span> <span class="k">as</span> <span class="n">HandleErrorInfo</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">result</span><span class="p">.</span><span class="n">ViewData</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ViewDataDictionary</span><span class="p">(</span><span class="n">model</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">//If you need ViewData set by controller, You can add items of Controller.ViewData to View&#39;s ViewData.</span>
 </span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -293,16 +293,14 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">  [HandleErrorWithCustomModel(View=&quot;ErrorWithCustomModel&quot;, ModelProvider = typeof(ErrorModelProvider))]</span>
-</span><span class='line'>
-</span><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">ViewBag</span><span class="p">.</span><span class="n">Temperature</span> <span class="p">=</span> <span class="s">&quot;67&quot;</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">ViewBag</span><span class="p">.</span><span class="n">Message</span> <span class="p">=</span> <span class="s">&quot;Modify this template to jump-start your ASP.NET MVC application.&quot;</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">}</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">[HandleErrorWithCustomModel(View=&quot;ErrorWithCustomModel&quot;, ModelProvider = typeof(ErrorModelProvider))]</span>
+</span><span class='line'><span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>   <span class="n">ViewBag</span><span class="p">.</span><span class="n">Temperature</span> <span class="p">=</span> <span class="s">&quot;67&quot;</span><span class="p">;</span>
+</span><span class='line'>   <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">();</span>
+</span><span class='line'>   <span class="n">ViewBag</span><span class="p">.</span><span class="n">Message</span> <span class="p">=</span> <span class="s">&quot;Modify this template to jump-start your ASP.NET MVC application.&quot;</span><span class="p">;</span>
+</span><span class='line'>   <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -310,7 +308,10 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
 
 <p><img src="/images/posts/aspdotnetmvc/error_custom_model.png"></p>
 
-<p>  In this part, we have seen how to extend the default exception filter to use custom models.</p>
+<p>  In this part, we have seen how to extend the default exception filter to use a custom model for an error view.</p>
+
+<p>Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
+~</p>
 </div>
 
 
@@ -356,7 +357,7 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/" title="Previous Post: ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & its Master/Layout">&laquo; ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & its Master/Layout</a>
+        <a class="basic-alignment left" href="/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata/" title="Previous Post: ASP.NET/MVC Exception Handling Part 2: ViewData for Error View & its Master/Layout">&laquo; ASP.NET/MVC Exception Handling Part 2: ViewData for Error View & its Master/Layout</a>
       
       
         <a class="basic-alignment right" href="/blog/2013/07/24/asp-dot-net-mvc-viewdata-provider-for-error-view/" title="Next Post: ASP.NET/MVC Exception Handling Part 4: ViewDataProvider for Error View">ASP.NET/MVC Exception Handling Part 4: ViewDataProvider for Error View &raquo;</a>
@@ -382,7 +383,7 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
       </li>
     
       <li class="post">
-        <a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">ASP.NET/MVC Exception Handling Part 2: Passing ViewData to Error View & its Master/Layout</a>
+        <a href="/blog/2013/07/18/asp-dot-net-mvc4-error-view-layout-viewdata/">ASP.NET/MVC Exception Handling Part 2: ViewData for Error View & its Master/Layout</a>
       </li>
     
       <li class="post">
