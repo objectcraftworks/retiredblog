@@ -158,3 +158,6 @@ That's why framework adds the HandleError filter to the Global Filter collection
     Global Filters to handle exceptions globally
     An error view 
 
+
+Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
+~                 

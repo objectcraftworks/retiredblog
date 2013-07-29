@@ -23,16 +23,16 @@ Let's do this with our example of displaying customer contact information based 
 Let's define a model for this.
      
 ``` csharp CustomModel 
-    public class CustomModel
-    {
-        public Exception Exception { get; set; }
-        public SupportInfo SupportInfo { get; set; }
-    }
+public class CustomModel
+{
+   public Exception Exception { get; set; }
+   public SupportInfo SupportInfo { get; set; }
+}
 
-    public class SupportInfo
-    {
-       public string ContactNo{get;set;}
-    }
+public class SupportInfo
+{
+   public string ContactNo{get;set;}
+}
 ```
 Let's see how we would have done if it were happy path views. 
 We would
@@ -45,11 +45,11 @@ We would
 When we do above steps, the code would look as shown below.
 
 ``` csharp
-    public ActionResult SomeAction() {
+public ActionResult SomeAction() {
      //controller context
-     var supportInfo = GetSupportInfo(ControllerContext);//a call to either your repo, or service
-     return View(supportInfo);//which sets the model on the view
-    }
+   var supportInfo = GetSupportInfo(ControllerContext);//a call to either your repo, or service
+   return View(supportInfo);//which sets the model on the view
+}
 ``` 
   That's a clean separation of concerns, of course the beauty of this code structure is coming from MVC pattern. 
 
@@ -62,16 +62,16 @@ When we do above steps, the code would look as shown below.
   ```SupportInfo```, 
    We need to LoadSupportInfo, and set that as a model, similar to what we would normally do for happy path views.
 ``` csharp
-    //controller context
-    var supportInfo = GetSupportInfo(ControllerContext);
-    ViewResult.ViewData.Model = supportInfo;
+//controller context
+var supportInfo = GetSupportInfo(ControllerContext);
+ViewResult.ViewData.Model = supportInfo;
 ``` 
    
 It turns out that we can this by extending HandleError filter. 
    HandleError allows you specify error(default is Error.cshtml) or master/layout for your error view. Here is how you can specify different error, and layout.
 
 ``` csharp   
-  [HandleError(Master="_ErrorLayout", View="ErrorWithCustomModel")]
+[HandleError(Master="_ErrorLayout", View="ErrorWithCustomModel")]
 ```   
   This is a good thing that HandleError allows custom views and layouts, but not custom model.  
 
@@ -81,7 +81,7 @@ We are essentially providing a model to the framework. So we can add a new prope
 
 
 ``` csharp   
-  [HandleErrorWithCustomModel(View="ErrorWithCustomModel", ModelProvider=typeof(ErrorModelProvider))]
+[HandleErrorWithCustomModel(View="ErrorWithCustomModel", ModelProvider=typeof(ErrorModelProvider))]
 ```
 
   Now we need define a contract for ModelProvider. 
@@ -89,68 +89,70 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
 
 ``` csharp contract 
 public interface IErrorModelProvider
-    {
-        object GetModel(ExceptionContext context, HandleErrorInfo defaultModel);
-    }
+{
+   object GetModel(ExceptionContext context, HandleErrorInfo defaultModel);
+}
 ```
 
 We can implement it as shown below.
   
-``` csharp implementation 
-    public class ErrorModelProvider :IErrorModelProvider
+``` csharp 
+public class ErrorModelProvider : IErrorModelProvider
+{
+    public object GetModel(ExceptionContext context, HandleErrorInfo defaultModel)
     {
-        public object GetModel(ExceptionContext context, HandleErrorInfo defaultModel)
+        return new CustomModel
         {
-            return new CustomModel
-                {
-                   Exception = context.Exception,
-                   SupportInfo = GetSupportInfo(context) 
-               };
-        }
-        SupportInfo GetSupportInfo(ExceptionContext context){
-         return new SupportInfo{ 
-              ContactNo = "1800SUPPORT"; 
-           };// or you can load it from external source
-        }
+            Exception = context.Exception,
+            SupportInfo = GetSupportInfo(context)
+        };
     }
+    SupportInfo GetSupportInfo(ExceptionContext context){
+         return new SupportInfo{
+              ContactNo = "1800SUPPORT";
+           };// or you can load it from an external source
+        }
+}
 ```
- Now that we have custom model, let's extend the default filter to use this model.
+ Now that we have a custom model, let's extend the default filter to use this model.
 
 ``` csharp 
-   [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-    public class HandleErrorWithCustomModelAttribute : HandleErrorAttribute
-    {
-        public Type ModelProvider { get; set; }
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+public class HandleErrorWithCustomModelAttribute : HandleErrorAttribute
+{
+    public Type ModelProvider { get; set; }
 
-        public override void OnException(ExceptionContext filterContext)
-        {
-            base.OnException(filterContext);
-            var result = filterContext.Result as ViewResult;
-            var modelProvider = Activator.CreateInstance(ModelProvider) as IErrorModelProvider;
-            var model = modelProvider.GetModel(filterContext, result.Model as HandleErrorInfo);
-            result.ViewData = new ViewDataDictionary(model);
-            //If you need ViewData set by controller, You can add items of Controller.ViewData to View's ViewData.
-        }
+    public override void OnException(ExceptionContext filterContext)
+    {
+        base.OnException(filterContext);
+        var result = filterContext.Result as ViewResult;
+        var modelProvider = Activator.CreateInstance(ModelProvider) as IErrorModelProvider;
+        var model = modelProvider.GetModel(filterContext, result.Model as HandleErrorInfo);
+        result.ViewData = new ViewDataDictionary(model);
+        //If you need ViewData set by controller, You can add items of Controller.ViewData to View's ViewData.
     }
+}
 ```
 
 Let's add this filter to Home/Index as shown below.
 
 ```  csharp HomeController.cs
-
-  [HandleErrorWithCustomModel(View="ErrorWithCustomModel", ModelProvider = typeof(ErrorModelProvider))]
-      
- public ActionResult Index()
-        {
-            ViewBag.Temperature = "67";
-            throw new ArgumentNullException();
-            ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
-            return View();
-  }
+[HandleErrorWithCustomModel(View="ErrorWithCustomModel", ModelProvider = typeof(ErrorModelProvider))]
+public ActionResult Index()
+{
+   ViewBag.Temperature = "67";
+   throw new ArgumentNullException();
+   ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
+   return View();
+}
 ```
 
 if you run the application now, you should see Custom Error View with custom model, displaying ContactNo correctly from model.
 
 {% img /images/posts/aspdotnetmvc/error_custom_model.png %}
 
-  In this part, we have seen how to extend the default exception filter to use custom models.
+  In this part, we have seen how to extend the default exception filter to use a custom model for an error view.
+
+
+Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
+~                 
