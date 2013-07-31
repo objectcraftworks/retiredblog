@@ -4,7 +4,7 @@
   <title><![CDATA[Category: DRY | Object Craftworks]]></title>
   <link href="http://objectcraftworks.github.io/blog/categories/dry/atom.xml" rel="self"/>
   <link href="http://objectcraftworks.github.io/"/>
-  <updated>2013-07-31T16:28:51-04:00</updated>
+  <updated>2013-07-31T16:38:59-04:00</updated>
   <id>http://objectcraftworks.github.io/</id>
   <author>
     <name><![CDATA[ObjectCraftworks.com]]></name>
@@ -188,10 +188,9 @@ That&rsquo;s why framework adds the HandleError filter to the Global Filter coll
 HandleErrorInfo model for Error View
 Global Filters to handle exceptions globally
 An error view 
-</code></pre></blockquote>
+</code></pre>
 
-<p>Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
-~</p>
+<p>~</p></blockquote>
 ]]></content>
   </entry>
   
