@@ -152,7 +152,3 @@ if you run the application now, you should see Custom Error View with custom mod
 {% img /images/posts/aspdotnetmvc/error_custom_model.png %}
 
   In this part, we have seen how to extend the default exception filter to use a custom model for an error view.
-
-
-Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
-~                 

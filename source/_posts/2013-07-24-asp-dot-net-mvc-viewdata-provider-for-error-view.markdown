@@ -130,6 +130,4 @@ We have seen how we can use filters to extend the ASP.NET/MVC framework and hand
  * In Part2, We extended default error filter to pass the View Data items set by a controller to Error View
  * In Part3, We wrote an exception filter by extending the default filter to use Custom model and set the model for the error view.
  * In Part4, We extended what learned so far, and provided a way to set the custom view data provider for the error view.
-
    
-Disclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages. 

@@ -123,7 +123,3 @@ You can get the full listing for the filter from Github.
 {% gist 6065646 HandleErrorWithViewDataAttribute.cs %}
 
  In this part, We have extended the HandleError filter to set the viewdata keys on the ViewResult. This enabled us to use a master/layout for an error view.
-
-
-sclaimer: Code listings used to demonstrate the concepts are not ready for production use. So use at your own discretion. ObjectCraftworks is not responsible for any damages.
-~                 
