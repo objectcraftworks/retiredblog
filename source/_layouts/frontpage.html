@@ -2,7 +2,6 @@
 {% include head.html %}
 <body id='frontpage' class="sidebar-footer">
   <nav role="navigation">{% include navigation.html %}</nav>
-
   <div id="main">
     <div id="content">
       <div>
@@ -11,7 +10,8 @@
           {{ content | expand_urls: root_url }}
         </article>
       </div>
-    </div>
+  </div>
+{% comment %}
     <aside class="sidebar">
       {% if site.page_asides.size %}
         {% include_array frontpage_asides %}
@@ -19,6 +19,7 @@
         {% include_array default_asides %}
       {% endif %}
     </aside>
+{% endcomment %}
   </div>
   <footer role="contentinfo">{% include footer.html %}</footer>
   {% include after_footer.html %}

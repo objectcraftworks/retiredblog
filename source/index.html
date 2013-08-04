@@ -7,14 +7,14 @@ layout: default
   {% for post in paginator.posts %}
   {% assign content = post.content %}
     <article>
-      {% include article.html %}
+      {% include articles/dotnet %}
     </article>
   {% endfor %}
+  <div style=";margin:40px 20px"><a href="articles/dotnet">.NET</a></div>
   <div class="pagination">
     {% if paginator.next_page %}
       <a class="prev" href="{{paginator.next_page}}">&larr; Older</a>
     {% endif %}
-    <a href="/blog/archives">Blog Archives</a>
     {% if paginator.previous_page %}
     <a class="next" href="{{paginator.previous_page}}">Newer &rarr;</a>
     {% endif %}

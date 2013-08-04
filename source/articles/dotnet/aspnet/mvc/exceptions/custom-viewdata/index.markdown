@@ -1,11 +1,7 @@
 ---
-layout: post
-author: Craftsman
+layout: page
 title: "ASP.NET/MVC Exception Handling Part 4: ViewDataProvider for Error View"
-date: 2013-07-24 16:07
 comments: true
-categories:
- ASP.NET/MVC4
 ---
  As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View. Also, We have seen in [part2](/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling) and [part3](/blog/2013/07/23/custom-model-for-errorview), how we can extend the default exception filter to keep the viewdata items set by controller and to use a custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use the techniques covered so far.
  

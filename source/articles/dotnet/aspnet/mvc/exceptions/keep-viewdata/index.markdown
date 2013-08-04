@@ -1,11 +1,7 @@
 ---
-layout: post
-author: Craftsman
+layout: page 
 title: "ASP.NET/MVC Exception Handling Part 2: ViewData for Error View & its Master/Layout"
-date: 2013-07-18 16:07
 comments: true
-categories:
- ASP.NET/MVC4
 ---
    In [Part1](/blog/2013/07/18/asp-dot-net-exception-handling-explained) of this article, we covered default exception handling of the ASP.NET/MVC framework.
    In this part, We will see how to keep the view data set by the controller for error view and master/layout.

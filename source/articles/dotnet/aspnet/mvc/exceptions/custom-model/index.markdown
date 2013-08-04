@@ -1,11 +1,7 @@
 ---
-layout: post
-author: Craftsman
+layout: page
 title: "ASP.NET MVC Exception Handling Part 3: Custom Model for Error View"
-date: 2013-07-23 16:07
 comments: true
-categories:
- ASP.NET/MVC4
 ---
  
 In [Part1](/blog/2013/07/18/asp-dot-net-exception-handling-explained) of this article, we covered default exception handling of the ASP.NET/MVC framework.

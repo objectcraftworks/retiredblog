@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: page
 author: Craftsman
 title: "ASP.NET/MVC Exception Handling Part1: Exception Handling Explained"
 date: 2013-07-17 16:07

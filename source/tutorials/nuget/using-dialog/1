@@ -1,29 +1,22 @@
 ---
 layout: page
-title: "nuget"
+title: "Managing Packages using NuGet Dialog"
 date: 2013-07-08 20:24
 comments: true
 sharing: true
 footer: true
 ---
- In this tutorial, We will be covering every day use of Nuget, such as 
+ 
+We will see how to manage nuget packages using NuGet Dialog. 
 
-+ Install a package 
-  + <a href="#install-using-dialog">Using Nuget Dialog</a>
-  + Using Package Manager Console 
-* Find installed packages
-  + <a href="#installed-packages-using-dialog">Using Nuget Dialog</a>
-  + Using Package Manager Console
-* Uninstall a package
-  + <a href="#uninstall-package-using-dialog">Using Nuget Dialog</a>
-* Update a package
-  + <a href="#update-package-using-dialog">Using Nuget Dialog</a>
-* Managing solution wide packages
-  + <a href="#manage-solutionwide-packages-using-dialog">Using Nuget Dialog</a>
-* Install/Update a particular version of a package
-* Assembly Binding Redirect
-
-   We will be using two interfaces of Nuget - Nuget Dialog & Package Manager Powershell Console.
+> We will cover how to,
+  
+    + <a href="#install-using-dialog">Install a package</a>
+    + <a href="#installed-packages-using-dialog">Find installed packages</a>
+    + <a href="#uninstall-package-using-dialog">Uninstal a package</a>
+    + <a href="#update-package-using-dialog">Update a package</a>
+    + <a href="#manage-solutionwide-packages-using-dialog">Manage packages in a solution</a>
+    + <a href="#get-package-particular-version"> Install/Update a particular version of a package</a>
 
   In this tutorial, we will use a visual studio solution with two asp.net mvc4 projects. 
 
@@ -77,7 +70,7 @@ In a Nutshell, To install a package using Nuget Dialog,
 
 <div id="installed-packages-using-dialog"></div>
 
-* #### Check installed packages in the project using Nuget Dialog
+* ####  Find installed packages in the project using Nuget Dialog
   1.Open Nuget Dialog, and click installed packages. You can view all, or search a particular package as we did while installing log4net package. 
      {% img /images/tutorials/nuget/installed_packages.png package install observation%}
   >   If you are wondering why ASP.NET MVC 4 project has so many installed packages, these packages are added out of the box by asp.net mvc 4 project template.
@@ -142,35 +135,14 @@ For this task, we will have to add another project. Let's go ahead and add anoth
 {% img /images/tutorials/nuget/mgm_sln_update_pkg_observation.png Manage packages for solution %}
 
 
-* #### finding all available versions 
-  
-{% img /images/tutorials/nuget/find_all_versions_console.png Installing a particular version  %}
-
-* #### installing a particular version 
-  
-{% img /images/tutorials/nuget/install_particular_version_console.png Installing a particular version  %}
-
-
-* #### removing a package 
-  
-{% img /images/tutorials/nuget/uninstall_package_console.png  updating to latest version  %}
-
-* #### updating to a particular version 
-  
-{% img /images/tutorials/nuget/updating_particular_version_console.png  updating to a particular version  %}
-
-* #### updating to latest  version 
-  
-{% img /images/tutorials/nuget/update_package_console.png  updating to latest version  %}
-
-
-* #### updating a package updates all projects in solution 
-  
-{% img /images/tutorials/nuget/update_package_updates_sln.png  updating to latest version  %}
-
 * #### removing a package from all the projects in the solution
  
 {% img /images/tutorials/nuget/remove_all_projects_dialog.png Manage packages for solution %}
-{% img /images/tutorials/nuget/not_removed_package_dependencies.png Manage packages for solution %}
+
+
+* #### Installing/Updating a particular version 
+  You can't install or update using the Nuget Dialog. You will have to use the Package Manager Console to install or update a particular version of a package.
+If you want to install/update a particular version, and/or manage packages using Package Manager Console, there is an [article](using-console/) covering it in detail. 
+
 
 
