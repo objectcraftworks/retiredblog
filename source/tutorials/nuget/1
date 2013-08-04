@@ -1,0 +1,15 @@
+---
+layout: page
+title: "nuget"
+date: 2013-07-08 20:24
+comments: true
+sharing: true
+footer: true
+---
+
+## What's Nuget?
+  If you are new to Nuget, you would be doing several things to install a package say for example NHibernate. You will first google it for the download link,
+and download it, and install it or unzip it, and copy the necessary assemblies to your lib folder where you maintain all dependent assemblies. In the case of NHibernate, you will have add configuration settings to your web.config/app.config 
+ You will be repeating more or less similar steps to upgrade a package. 
+ 
+
