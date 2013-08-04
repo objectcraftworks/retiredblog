@@ -5,12 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>nuget - Object Craftworks</title>
+  <title>Managing Packages using NuGet Dialog - Object Craftworks</title>
   <meta name="author" content="ObjectCraftworks.com">
 
   
-  <meta name="description" content="Nuget Jul 8th, 2013 In this tutorial, We will be covering every day use of Nuget, such as Install a package Using Nuget Dialog
-Using Package Manager &hellip;">
+  <meta name="description" content="Managing Packages Using NuGet Dialog Jul 8th, 2013 We will see how to manage nuget packages using NuGet Dialog. Content:
+Install a package
+Find &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +20,7 @@ Using Package Manager &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://objectcraftworks.github.io/tutorials/nuget/">
+  <link rel="canonical" href="http://objectcraftworks.github.io/tutorials/nuget/using-dialog/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -76,7 +77,7 @@ Using Package Manager &hellip;">
 <article role="article">
   
   <header>
-    <h1 class="entry-title">Nuget</h1>
+    <h1 class="entry-title">Managing Packages Using NuGet Dialog</h1>
     <p class="meta">
 
 
@@ -92,49 +93,20 @@ Using Package Manager &hellip;">
 <time datetime="2013-07-08T20:24:00-04:00" pubdate data-updated="true">Jul 8<span>th</span>, 2013</time></p>
   </header>
   
-  <p> In this tutorial, We will be covering every day use of Nuget, such as</p>
+  <p>We will see how to manage nuget packages using NuGet Dialog.</p>
 
-<ul>
-<li>Install a package
+<div>
+<div>Content:</div>
+<div><a href="#install-using-dialog">Install a package</a></div>
+<div><a href="#installed-packages-using-dialog">Find installed packages</a></div>
+<div><a href="#uninstall-package-using-dialog">Uninstall a package</a></div>
+<div><a href="#update-package-using-dialog">Update a package</a></div>
+<div><a href="#manage-solutionwide-packages-using-dialog">Manage packages in a solution</a></div>
+<div><a href="#get-package-particular-version"> Install/Update a particular version of a package</a></div>
+</div>
 
-<ul>
-<li><a href="#install-using-dialog">Using Nuget Dialog</a></li>
-<li>Using Package Manager Console</li>
-</ul>
-</li>
-<li>Find installed packages
 
-<ul>
-<li><a href="#installed-packages-using-dialog">Using Nuget Dialog</a></li>
-<li>Using Package Manager Console</li>
-</ul>
-</li>
-<li>Uninstall a package
-
-<ul>
-<li><a href="#uninstall-package-using-dialog">Using Nuget Dialog</a></li>
-</ul>
-</li>
-<li>Update a package
-
-<ul>
-<li><a href="#update-package-using-dialog">Using Nuget Dialog</a></li>
-</ul>
-</li>
-<li>Managing solution wide packages
-
-<ul>
-<li><a href="#manage-solutionwide-packages-using-dialog">Using Nuget Dialog</a></li>
-</ul>
-</li>
-<li>Install/Update a particular version of a package</li>
-<li><p>Assembly Binding Redirect</p>
-
-<p> We will be using two interfaces of Nuget &ndash; Nuget Dialog &amp; Package Manager Powershell Console.</p>
-
-<p>In this tutorial, we will use a visual studio solution with two asp.net mvc4 projects.</p></li>
-</ul>
-
+<p>  In this tutorial, we will use a visual studio solution with two asp.net mvc4 projects.</p>
 
 <h2>What&rsquo;s Nuget?</h2>
 
@@ -154,26 +126,23 @@ and download it, and install it or unzip it, and copy the necessary assemblies t
 <div id="install-using-dialog"></div>
 
 
-<ul>
-<li><h4>Install a package using Nuget Dialog</h4>
+<h2>Install a package using Nuget Dialog</h2>
 
 <p>We will try to add log4Net.</p>
 
 <ol>
-<li><p>Right click on the project in the solution explorer, and then
+<li><p> Right click on the project in the solution explorer, and then
 click on <strong>Manage NuGet Packages</strong> on the menu
 <img src="/images/tutorials/nuget/open_nuget_dialog.png" title="Open Nuget Dialog" ></p></li>
-<li><p>It opens the Nuget dialog
+<li><p> It opens the Nuget dialog
 <img src="/images/tutorials/nuget/nuget_dialog.png" title="Nuget Dialog" ></p></li>
-<li><p>Search for a package. Type log4Net in search box, and hit enter.
+<li><p> Search for a package. Type log4Net in search box, and hit enter.
 <img src="/images/tutorials/nuget/search_package.png" title="Nuget Dialog" ></p></li>
-<li><p>You should see search results in the dialog. Select jQuery package, and click on install.
+<li><p> You should see search results in the dialog. Select jQuery package, and click on install.
 <img src="/images/tutorials/nuget/install_package.png" title="Install using Nuget Dialog" ></p></li>
-<li><p>Once installation is done, you should see reference to log4net in your project.
-<img src="/images/tutorials/nuget/observe_package_install.png" title="package install observation" ></p></li>
+<li><p> Once installation is done, you should see reference to log4net in your project.
+ <img src="/images/tutorials/nuget/observe_package_install.png" title="package install observation" ></p></li>
 </ol>
-</li>
-</ul>
 
 
 <blockquote><p> Congratulations. You just installed a nuget package using Nuget Dialog.</p></blockquote>
@@ -188,61 +157,52 @@ click on <strong>Manage NuGet Packages</strong> on the menu
 <div id="installed-packages-using-dialog"></div>
 
 
-<ul>
-<li><h4>Check installed packages in the project using Nuget Dialog</h4>
+<h2>Find installed packages in the project</h2>
 
-1.Open Nuget Dialog, and click installed packages. You can view all, or search a particular package as we did while installing log4net package.
-   <img src="/images/tutorials/nuget/installed_packages.png" title="package install observation" >
+<p>1.Open Nuget Dialog, and click installed packages. You can view all, or search a particular package as we did while installing log4net package.</p>
+
+<pre><code> &lt;img src="/images/tutorials/nuget/installed_packages.png" title="package install observation" &gt;
+</code></pre>
 
 <blockquote><p>  If you are wondering why ASP.NET MVC 4 project has so many installed packages, these packages are added out of the box by asp.net mvc 4 project template.</p></blockquote>
 
-<pre><code>1. Bring up Nuget dialog
-2. Click on Installed packages
-3. You can see all installed packages or search for a particular package
-</code></pre></li>
-</ul>
-
+<pre><code>  1. Bring up Nuget dialog
+  2. Click on Installed packages
+  3. You can see all installed packages or search for a particular package
+</code></pre>
 
 <div id="uninstall-package-using-dialog"></div>
 
 
-<ul>
-<li><h4>Uninstall a package using Nuget Dialog</h4>
+<h2>Uninstall a package</h2>
 
 <ol>
-<li>Bring up Nuget Dialog, click installed packages, and search for log4net.
-You should see log4net in the search results.Click uninstall button.
-<img src="/images/tutorials/nuget/uninstall_package_dialog.png" title="package install observation" ></li>
-<li>To test our action, let&rsquo;s verify that log4net is removed from the references.</li>
+<li> Bring up Nuget Dialog, click installed packages, and search for log4net.
+ You should see log4net in the search results.Click uninstall button.
+ <img src="/images/tutorials/nuget/uninstall_package_dialog.png" title="package install observation" ></li>
+<li> To test our action, let&rsquo;s verify that log4net is removed from the references.</li>
 </ol>
-</li>
-</ul>
 
 
 <div id="update-package-using-dialog"></div>
 
 
-<ul>
-<li><h4>Update a package using Nuget Dialog</h4>
+<h2>Update a package</h2>
 
-<p>For this, we will update jQuery. ASP.NET MVC 4 adds jQuery 1.8.2 when creating the project. We will update jQuery using Nuget and see what happens.</p>
+<p>  For this, we will update jQuery. ASP.NET MVC 4 adds jQuery 1.8.2 when creating the project. We will update jQuery using Nuget and see what happens.</p>
 
 <ol>
-<li><p>Bring up Nuget Dialog, click updates. if you don&rsquo;t see jQuery, search.
-You should see jQuery in the search results.Click update button.
-<img src="/images/tutorials/nuget/update_package_dialog.png" title="package update" ></p></li>
-<li><p>Let&rsquo;s check whether jQuery version is updated. It updates in Scripts folder.
-<img src="/images/tutorials/nuget/update_package_observation.png" title="package update" ></p></li>
+<li><p> Bring up Nuget Dialog, click updates. if you don&rsquo;t see jQuery, search.
+ You should see jQuery in the search results.Click update button.
+ <img src="/images/tutorials/nuget/update_package_dialog.png" title="package update" ></p></li>
+<li><p> Let&rsquo;s check whether jQuery version is updated. It updates in Scripts folder.
+ <img src="/images/tutorials/nuget/update_package_observation.png" title="package update" ></p></li>
 </ol>
 
 
-<p>Now, What&rsquo;s official package source?</p></li>
-</ul>
-
+<p>  Now, What&rsquo;s official package source?</p>
 
 <blockquote><p>Nuget uses a central repository, where package can be published. When you are either searching online, or looking for updates, Nuget checks in the central repository. That repository is called official package source.</p></blockquote>
-
-<p>Can you have multiple package sources? We will come to that in a bit.</p>
 
 <pre><code> 1. Bring up the Nuget dialog, click on updates 
    * search if it's not visible in the list. 
@@ -252,12 +212,9 @@ You should see jQuery in the search results.Click update button.
 <div id="manage-solutionwide-packages-using-dialog"></div>
 
 
-<ul>
-<li><h4>Managing packages in a solution</h4></li>
-</ul>
+<h2>Manage packages in a solution</h2>
 
-
-<p>For this task, we will have to add another project. Let&rsquo;s go ahead and add another ASP.NET MVC 4 project. Let&rsquo;s call it AppAdmin.</p>
+<p>For this task, we will have to add an another project. Let&rsquo;s go ahead and create a ASP.NET MVC 4 project. Let&rsquo;s call it AppAdmin.</p>
 
 <ol>
 <li> This time, let&rsquo;s bring up the context menu by right clicking on the solution.
@@ -280,55 +237,21 @@ You should see jQuery in the search results.Click update button.
 <p><img src="/images/tutorials/nuget/mgm_sln_after_update.png" title="Manage packages for solution" >
 <img src="/images/tutorials/nuget/mgm_sln_update_pkg_observation.png" title="Manage packages for solution" ></p>
 
-<ul>
-<li><h4>finding all available versions</h4></li>
-</ul>
+<h4>Remove a package from all the projects in the solution</h4>
+
+<p><img src="/images/tutorials/nuget/remove_all_projects_dialog.png" title="Manage packages for solution" ></p>
+
+<div id="get-package-particular-version"></div>
 
 
-<p><img src="/images/tutorials/nuget/find_all_versions_console.png" title="Installing a particular version" ></p>
+<h2>Installing/Updating a particular version</h2>
 
-<ul>
-<li><h4>installing a particular version</h4></li>
-</ul>
+<p>   You can&rsquo;t install or update using the Nuget Dialog. You will have to use the Package Manager Console to install or update a particular version of a package.
+If you want to install/update a particular version, and/or manage packages using Package Manager Console, there is an <a href="using-console/">article</a> covering it in detail.</p>
 
+<p>  We have seen how to install, update, remove a package using NuGet Dialog. NuGet Dialog provides interface to manage packages in a solution. We learned that NuGet Dialog doesn&rsquo;t provide any interface to install or update  a particular version of a package. NuGet package authors and users use a central repository to publish and discover packages.</p>
 
-<p><img src="/images/tutorials/nuget/install_particular_version_console.png" title="Installing a particular version" ></p>
-
-<ul>
-<li><h4>removing a package</h4></li>
-</ul>
-
-
-<p><img src="/images/tutorials/nuget/uninstall_package_console.png" title="updating to latest version" ></p>
-
-<ul>
-<li><h4>updating to a particular version</h4></li>
-</ul>
-
-
-<p><img src="/images/tutorials/nuget/updating_particular_version_console.png" title="updating to a particular version" ></p>
-
-<ul>
-<li><h4>updating to latest  version</h4></li>
-</ul>
-
-
-<p><img src="/images/tutorials/nuget/update_package_console.png" title="updating to latest version" ></p>
-
-<ul>
-<li><h4>updating a package updates all projects in solution</h4></li>
-</ul>
-
-
-<p><img src="/images/tutorials/nuget/update_package_updates_sln.png" title="updating to latest version" ></p>
-
-<ul>
-<li><h4>removing a package from all the projects in the solution</h4></li>
-</ul>
-
-
-<p><img src="/images/tutorials/nuget/remove_all_projects_dialog.png" title="Manage packages for solution" >
-<img src="/images/tutorials/nuget/not_removed_package_dependencies.png" title="Manage packages for solution" ></p>
+<p>  NuGet definitely simplifies the package management for .NET solutions. There is a room for improvement in NuGet, but for now, we can do most of the basic things with NuGet.</p>
 
   
     <footer>
@@ -352,7 +275,7 @@ You should see jQuery in the search results.Click update button.
       
         <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://objectcraftworks.github.io/tutorials/nuget/index.html" data-via="" data-counturl="http://objectcraftworks.github.io/tutorials/nuget/index.html" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://objectcraftworks.github.io/tutorials/nuget/using-dialog/index.html" data-via="" data-counturl="http://objectcraftworks.github.io/tutorials/nuget/using-dialog/index.html" >Tweet</a>
   
   
   
@@ -397,8 +320,8 @@ You should see jQuery in the search results.Click update button.
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://objectcraftworks.github.io/tutorials/nuget/index.html';
-        var disqus_url = 'http://objectcraftworks.github.io/tutorials/nuget/index.html';
+        var disqus_identifier = 'http://objectcraftworks.github.io/tutorials/nuget/using-dialog/index.html';
+        var disqus_url = 'http://objectcraftworks.github.io/tutorials/nuget/using-dialog/index.html';
         var disqus_script = 'embed.js';
       
     (function () {

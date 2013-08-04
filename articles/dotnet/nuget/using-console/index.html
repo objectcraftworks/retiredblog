@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Managing Nuget packages using Package Manager Console - Object Craftworks</title>
+  <meta name="author" content="ObjectCraftworks.com">
+
+  
+  <meta name="description" content="Managing Nuget Packages Using Package Manager Console In this tutorial, We will be covering every day use of Nuget using Package Manager Console. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://objectcraftworks.github.io/articles/dotnet/nuget/using-console/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Object Craftworks" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-42416416-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Object Craftworks</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:objectcraftworks.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/articles/dotnet">.NET</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article role="article">
+  
+  <header>
+    <h1 class="entry-title">Managing Nuget Packages Using Package Manager Console</h1>
+    
+  </header>
+  
+  <p> In this tutorial, We will be covering every day use of Nuget using Package Manager Console. Nuget has two client interfaces. You can use NuGet Dialog, an UI, or the Console, which is a powershell console. At this time, You will have to use the console if you want to install or update a particular version of a package.</p>
+
+<h2>Contents</h2>
+
+<p> <div>   <a href="#Find%20all%20available%20versions">Find all available versions</a></div>
+ <div>   <a href="#Install%20a%20particular%20version">Install a particular version</a></div>
+ <div>   <a href="#Update%20to%20a%20particular%20version">Update to a particular version</a></div>
+ <div>   <a href="#Update%20to%20a%20latest%20version">Update to a latest version</a></div>
+ <div>   <a href="#Updating%20a%20package%20updates%20all%20projects">Updating a package updates all projects</a></div>
+ <div>   <a href="#Remove%20a%20package">Remove a package</a></div>
+ <div>   <a href="#manage-packages-for-a-solution">Managing packages for a solution</a></div></p>
+
+<p> In this tutorial, we will use a visual studio solution with two asp.net mvc4 projects.</p>
+
+<h2>What&rsquo;s Nuget?</h2>
+
+<p>  Without Nuget, you would be doing several things to install a package say for example NHibernate. You will first google it for the download link,
+and download it, and install it or unzip it, and copy the necessary assemblies to your lib folder where you maintain all dependent assemblies.you might have to add configuration settings to your web.config/app.config</p>
+
+<p> You will be repeating more or less similar steps to upgrade a package.</p>
+
+<p> Removing a package becomes tricky, and if it&rsquo;s a old,legacy package, it gets harder. If you look at any legacy enterprise .NET visual studio solutions, You will find several references to unused assemblies and their configuration settings. It usually takes a heroic effort to clean up dead code with out breaking changes.</p>
+
+<p>  Good news is that Nuget makes aforementioned process easy. Nuget is a visual studio extension.Nuget provides a central repository, where package authors publish their packages. Nuget also provides client tools to find, download, install, update, and remove packages.</p>
+
+<p> What&rsquo;s a Nuget package? Short answer is it&rsquo;s similar to a install script. Nuget package bundles both actions to be taken when installing/uninstalling, assemblies, and other necessary files.</p>
+
+<p> Let&rsquo;s create a asp.net mvc project call it App. By default, Asp.net mvc 4 project adds several nuget packages, including jQuery 1.8.4 version.</p>
+
+<p>You can bring the Package Manager(PM) Console up using the menu item <em>Tools/Library Package Manager / Package Manager Console</em>.</p>
+
+<p><img src="/images/tutorials/nuget/pm_console_menu_item.png" title="Installing a particular version" ></p>
+
+<div id="Find all available versions"></div>
+
+
+<h2>Find all available versions</h2>
+
+<p> For this, we will try to install normalize.css package. Normalize.css keeps a web.app consistent across browsers. We can use get-package cmdlet to find the packages. <code>Get-Package</code> is a powershell cmdlet. Similar to NuGet Dialog, this cmdlet searches packages in the NuGet&rsquo;s repository. There are two parameters we will use to find Normalize.css and all its versions. They are <code>-ListAvailable</code>, and <code>-AllVersions</code>. <code>Get-Package</code> gets the list of all packages  matching  the search string, and also all the available versions. This gets latest version only, if you omit <code>-AllVersions</code> parameters.</p>
+
+<p>Let&rsquo;s go ahead, and run
+  <code>Get-Package -ListAvailable -AllVersions normalize.css</code> in the PM Console.</p>
+
+<p><img src="/images/tutorials/nuget/find_all_versions_console.png" title="Installing a particular version" ></p>
+
+<p>Now that we know all available version, let&rsquo;s go ahead install a particular version.
+<a id="Install a particular version"></a></p>
+
+<h2>Install a particular version</h2>
+
+<p> Let&rsquo;s say we want to install Normalize.css version 1.1.1. You can use another cmdlet Install-Package by passing the package id which is in this case Normalize.css and the version to the parameter -Version.
+If you don&rsquo;t specify a version, this cmdlet installs latest version available. In this example, that would be 2.1.2.</p>
+
+<p>Let&rsquo;s go ahead install normalize.css version 1.1.1 by running <code>install-package Normalize.css -Version 1.1.1</code>.</p>
+
+<p><img src="/images/tutorials/nuget/install_particular_version_console.png" title="Installing a particular version" ></p>
+
+<p>The console uses default project setting as the project for all cmdlets where <code>-Project</code> parameter is available. The cmdlet installed the package in the default project.
+As an exercise, let&rsquo;s go ahead install this particular version in other project AppAdmin.
+<a id="Update to a particular version"></a></p>
+
+<h2>Update to a particular version</h2>
+
+<p> We have seen how we can specify version to the cmdlet <code>install-package</code> using a parameter <code>-Version</code>, we can use same parameter to update a package to a particular version. But this time, there is another cmdlet. You will have to use <code>update-package</code>, along with parameter <code>-Version</code> to update a package to a pacticular version.</p>
+
+<p>  For this, we will try to update to <code>version 2.0.1</code> of Normalize.css package. We have already seen how to find the all available versions using the cmdlet get-package. Using get-package let&rsquo;s find again all available versions of the package Normalize.css. Then let&rsquo;s use cmd <code>update-package normalize.css -Version 2.0.1</code> to install 2.0.1 version of the Normalize.css package.</p>
+
+<p><img src="/images/tutorials/nuget/updating_particular_version_console.png" title="updating to a particular version" ></p>
+
+<p>Now what would <code>update-package</code> cmdlet do if you omit -Version?
+<a id="Update to a latest version"></a></p>
+
+<h2>Update to a latest version</h2>
+
+<p> We have just seen how to update to a particular version using the cmdlet <code>Update-Package</code> along with its parameter <code>-Version</code>. If you want to update to a latest version, then you just have to omit the <code>-Version</code> parameter as shown below.</p>
+
+<p> Without <code>-Version</code>, this would update to latest the version of Normalize.css.</p>
+
+<p><img src="/images/tutorials/nuget/update_package_console.png" title="updating to latest version" ></p>
+
+<p><a id="Updating a package updates all projects"></a></p>
+
+<h2>Updating a package updates all projects</h2>
+
+<p>As we talked about how NuGet uses the default project selection, and a cmdlet
+uses the default project as a value to -Project. What that means is that all cmds work on that project only, excep the cmdlet <code>update-package</code>. If you update-package with out -version, it updates
+the package in all projects which have this package installed.</p>
+
+<p>If you try to update the Normalize.css package, this will update the package in both the projects.</p>
+
+<p><img src="/images/tutorials/nuget/update_package_updates_sln.png" title="updating to latest version" ></p>
+
+<p>So far, we have seen how to install/update lastest version, and particular version using the Package Manager (PM) Console. Now we will try to remove the package we have just added.
+<a id="Remove a package"></a></p>
+
+<h2>Remove a package</h2>
+
+<p>The cmdlet <code>Uninstall-Package</code> removes a package in the default project as shown below.</p>
+
+<p><img src="/images/tutorials/nuget/uninstall_package_console.png" title="updating to latest version" ></p>
+
+<p><a id="manage-packages-for-a-solution"></a></p>
+
+<h2>Managing packages for a Solution</h2>
+
+<p>PM Console doesn&rsquo;t have a cmdlet to manage packages for a solution. So far we have seen how cmdlets work on the default project setting, except update-package, which updates a package in all project where the package is present. Using piping of two cmdlets, we can manage packages for a .NET solution.
+There is cmdlet <code>get-project</code> returns a project object which is a handle to IDE&rsquo;s project.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='powershell'><span class='line'><span class="nb">Get-Project</span> <span class="n">-All</span> <span class="c"># Returns all projects</span>
+</span><span class='line'><span class="nb">Get-Project</span>  <span class="c"># Returns the default project</span>
+</span><span class='line'><span class="nb">Get-Project</span> <span class="n">App</span><span class="p">,</span> <span class="n">AppAdmin</span> <span class="c"># Returns projects App, and AppAdmin   </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>if you want to remove the package Normalize.css from the both projects App, and AppAdmin, you can pipe both cmdlets get-project and uninstall-project as</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='powershell'><span class='line'> <span class="nb">Get-Project</span> <span class="n">App</span><span class="p">,</span><span class="n">AppAdmin</span> <span class="p">|</span> <span class="n">uninstall-package</span> <span class="n">Normalize</span><span class="p">.</span><span class="n">css</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here is how my PM console looks after executing both the cmdlets.</p>
+
+<p><img src="/images/tutorials/nuget/manage_pkgs_sln_console.png" title="updating to latest version" ></p>
+
+<h2>Wrap up</h2>
+
+<p>We have seen how to install, remove, update a package using the PM Console. You will have to use PM console to install or update a particular version. Nuget Dialog doesn&rsquo;t support installing or updating a particular version.</p>
+
+<hr />
+
+<p> Last Updated: 08/04/2013</p>
+
+<h4>Related Articles</h4>
+
+<h5><a href="using-dialog">Managing NuGet Packages using NuGet Dialog</a></h5>
+
+  
+    <footer>
+      
+      
+        <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://objectcraftworks.github.io/articles/dotnet/nuget/using-console/index.html" data-via="" data-counturl="http://objectcraftworks.github.io/articles/dotnet/nuget/using-console/index.html" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+    </footer>
+  
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - ObjectCraftworks - vpn at objectcraftworks dot com -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>. Design by <a href="http://octopressthemes.com">Octopress Themes</a>.</span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'objectcraftworks';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://objectcraftworks.github.io/articles/dotnet/nuget/using-console/index.html';
+        var disqus_url = 'http://objectcraftworks.github.io/articles/dotnet/nuget/using-console/index.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

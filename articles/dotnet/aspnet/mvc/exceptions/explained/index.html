@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>ASP.NET/MVC Exception Handling Part1: Exception Handling Explained - Object Craftworks</title>
+  <meta name="author" content="ObjectCraftworks.com">
+
+  
+  <meta name="description" content="ASP.NET/MVC Exception Handling Part1: Exception Handling Explained ASP.NET MVC framework provides a mechanism to handle exceptions. It&rsquo;s very &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/explained/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Object Craftworks" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-42416416-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Object Craftworks</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:objectcraftworks.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/articles/dotnet">.NET</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article role="article">
+  
+  <header>
+    <h1 class="entry-title">ASP.NET/MVC Exception Handling Part1: Exception Handling Explained</h1>
+    
+  </header>
+  
+  <p> ASP.NET MVC framework provides a mechanism to handle exceptions. It&rsquo;s very basic. It doesn&rsquo;t scale very well
+in real world situations. There are atleast two such situations, I ran into.
+The framework default exception handling doesn&rsquo;t handle these two situations.</p>
+
+<blockquote><ol>
+<li>If you need a custom model for your Error view.</li>
+<li>If your Error view needs a master/layout that depends on ViewData set by controllers.</li>
+</ol>
+</blockquote>
+
+<p>You will have to duplicate the code in the error view to handle these two situations. Lets see with a mockup.
+ <img src="/images/posts/aspdotnetmvc/exception_handling_problem.png"></p>
+
+<p> Let&rsquo;s see how we would implement the temperature display.As Master/layout is the most obvious place to display, we will have to set the view data again in the error view. This will be a duplicate code.</p>
+
+<p> <!-- more -->
+ If you want to pass contact information based on the customer location, you will have to set it in the view. This will tightly couple the View with the domain logic, undermining MVC phiolosphy of seperation of concerns.</p>
+
+<p>  We will develop new filters to handle these situations in this article, and see how we can apply DRY principle, and keep View and Domain loosely coupled.</p>
+
+<p>This article is a four part series.</p>
+
+<p>  We will see in</p>
+
+<pre><code>1. Part 1, how basic exception handling works. 
+2. Part 2, how to keep the view data set by controllers for Error Views. 
+3. Part 3, how to use a custom model.
+4. Part 4, how to set custom ViewData for ErrorViews. 
+</code></pre>
+
+<p>ASP.NET MVC Framework provides exception handling, and we will see how it works in this part.  (if you are familiar with the framework, you can skip this part.)</p>
+
+<blockquote><p>if you want to follow along hands on, You can create a ASP.NET MVC<br/>
+ web application. I am using MVC 4 version.</p></blockquote>
+
+<p>When you create a MVC project, it does two things for error handling purpose</p>
+
+<pre><code>    1. Creates an error view in shared folder (/Views/Shared/Error.cshtml)
+    2. Adds HandleError filter to Global filters (/AppStart/FilterConfig.cs) 
+</code></pre>
+
+<p>Let&rsquo;s first see the contents of the Error view. You would notice <code>@model</code> set to HandleErrorInfo. The Framework passes HandleErrorInfo to the view.</p>
+
+<figure class='code'><figcaption><span>Views/Shared/Error.cshtml </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>@model System.Web.Mvc.HandleErrorInfo
+</span><span class='line'>
+</span><span class='line'>@{
+</span><span class='line'>   ViewBag.Title = &quot;Error&quot;;
+</span><span class='line'> }
+</span><span class='line'> <span class="nt">&lt;hgroup</span> <span class="na">class=</span><span class="s">&quot;title&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'> <span class="nt">&lt;h1</span> <span class="na">class=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;</span>Error.<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'> <span class="nt">&lt;h2</span> <span class="na">class=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;</span>An error occurred while processing your request.<span class="nt">&lt;/h2&gt;</span>
+</span><span class='line'> <span class="nt">&lt;/hgroup&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+ We will talk about HandleErrorInfo type in a bit.</p>
+
+<p>Now, Let&rsquo;s see the contents of the FilterConfig.cs file. You would see HandleErrorAttribute filter is added to Global Filter Collection.</p>
+
+<figure class='code'><figcaption><span>AppStart/FilterConfig.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="k">public</span> <span class="k">class</span> <span class="nc">FilterConfig</span>
+</span><span class='line'> <span class="p">{</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterGlobalFilters</span><span class="p">(</span><span class="n">GlobalFilterCollection</span> <span class="n">filters</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>       <span class="n">filters</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HandleErrorAttribute</span><span class="p">());</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> To see whether the default mechanism is working fine, let&rsquo;s throw an exception,as shown below, in the HomeController/Index action.</p>
+
+<figure class='code'><figcaption><span>Controllers/HomeController.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+</span><span class='line'> <span class="p">{</span>
+</span><span class='line'>    <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">ViewBag</span><span class="p">.</span><span class="n">Message</span> <span class="p">=</span> <span class="s">&quot;Modify this template to jump-start your ASP.NET MVC application.&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+</span><span class='line'> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, if you haven&rsquo;t enabled custom errors, you just need to enable it in the <code>Web.Config</code>, as shown below, to have the framework&rsquo;s default exception mechanism to work.</p>
+
+<figure class='code'><figcaption><span>web.config</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;system.web&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;customErrors</span> <span class="na">mode=</span><span class="s">&quot;On&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>          <span class="c">&lt;!-- On/RemoteOnly. For this post, I used On --&gt;</span>
+</span><span class='line'><span class="nt">&lt;/system.web&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Now run the application. You should see the error page.</p>
+
+<p><img src="/images/posts/aspdotnetmvc/error_page.png" title="Default Error Page" ></p>
+
+<p> Now that we saw how default exception handling works,</p>
+
+<blockquote><p>let&rsquo;s summarize the code elements we noticed so far.</p>
+
+<ul>
+<li>HandleError filter</li>
+<li>HandleErrorInfo model for Error view</li>
+<li>GlobalFilters</li>
+<li>Error view</li>
+</ul>
+</blockquote>
+
+<p>We will briefly go through each element, and see what it does.</p>
+
+<h4>HandleError filter</h4>
+
+<p> The important code element of the framework&rsquo;s default exception handling is HandleErrorAttribute. HandleErrorAttribute is actually an exception filter. There are several types of filters in MVC framework to extend the behavior of the actions.
+Exception filter is one of them. Exception filters are called when an exception is caught by the framework.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">HandleErrorAttribute</span> <span class="p">:</span> <span class="n">FilterAttribute</span><span class="p">,</span> <span class="n">IExceptionFilter</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> The HandleError filter is framework&rsquo;s default exception filter to handle exceptions globally. This is done by adding this filter to Global filters as seen in FilterConfig.cs.</p>
+
+<figure class='code'><figcaption><span>AppStart/FilterConfig.cs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="n">filters</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HandleErrorAttribute</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> The basic behavior of this filter is this:</p>
+
+<pre><code>creates a ViewResult using given View and Master
+creates a model of type HandleErrorInfo 
+sets the model on ViewData of the ViewResult
+sets the HTTP status to 500
+</code></pre>
+
+<p> This filter need not to be global. You can handle exception either at an action level or at the controller level.</p>
+
+<p> If you want to handle a particular exception differently with a custom view and/or master, You can do that too.
+ For example, if you want to handle an ArgumentNullException differently for an Index action with different error and/or master, you can do as shown below</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na"> [HandleError(ExceptionType=typeof(ArgumentNullException),Order = 1, Master=&quot;_ErrorLayout&quot;, View=&quot;CustomError&quot;)]</span>
+</span><span class='line'> <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Now that we have seen how this filter works, let&rsquo;s see next important code element.</p>
+
+<h4>HandleErrorInfo</h4>
+
+<p>We have seen in Error.cshtml that <code>@model</code> is set to <code>HandleErrorInfo</code>.
+HandleErrorInfo has properties for the  Exception that is being handled, and names of Controller and action.</p>
+
+<h4>Global filters</h4>
+
+<p> The framework defines scope and order for how the filters are called.
+Global scope is last in the order, but gets called for every action.
+That&rsquo;s why framework adds the HandleError filter to the Global Filter collection. It doesnot stop you add the filter at action or controller levels.</p>
+
+<h4>Error View</h4>
+
+<p> The framework generates very basic view. It has access to HandleErrorInfo. Using the model, you can get Exception that is being handled, and the action/controller that caused the exception.</p>
+
+<blockquote><p>We have seen how ASP.NET MVC framework provides exception handling, and how following code elements play the role</p>
+
+<pre><code>HandleError filter
+HandleErrorInfo model for Error View
+Global Filters to handle exceptions globally
+An error view 
+</code></pre></blockquote>
+
+  
+    <footer>
+      
+      
+        <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/explained/index.html" data-via="" data-counturl="http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/explained/index.html" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+    </footer>
+  
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - ObjectCraftworks - vpn at objectcraftworks dot com -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>. Design by <a href="http://octopressthemes.com">Octopress Themes</a>.</span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'objectcraftworks';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/explained/index.html';
+        var disqus_url = 'http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/explained/index.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
