@@ -153,5 +153,5 @@ If you want to install/update a particular version, and/or manage packages using
 Last Updated: 07/27/2013
 
 #### Related Articles
-##### [Managing NuGet Packages using NuGet Console](../using-console)
+##### [Managing NuGet Packages using NuGet Console](/articles/dotnet/nuget/using-console)
   
