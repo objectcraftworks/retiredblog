@@ -127,4 +127,4 @@ We have seen how to install, remove, update a package using the PM Console. You 
  Last Updated: 08/04/2013
  
 #### Related Articles
-##### [Managing NuGet Packages using NuGet Dialog](using-dialog)
+##### [Managing NuGet Packages using NuGet Dialog](../using-dialog)
