@@ -16,31 +16,25 @@
         <loc>
             http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/custom-model/
         </loc>
-        <lastmod>2013-08-04T18:19:29-04:00</lastmod>
+        <lastmod>2013-08-07T13:44:32-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/custom-viewdata/
         </loc>
-        <lastmod>2013-08-04T18:19:14-04:00</lastmod>
+        <lastmod>2013-08-07T13:45:07-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/explained/
         </loc>
-        <lastmod>2013-08-04T18:20:12-04:00</lastmod>
-    </url>
-    <url>
-        <loc>
-            http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/explained.html
-        </loc>
-        <lastmod>2013-08-04T17:35:48-04:00</lastmod>
+        <lastmod>2013-08-07T13:41:08-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://objectcraftworks.github.io/articles/dotnet/aspnet/mvc/exceptions/keep-viewdata/
         </loc>
-        <lastmod>2013-08-04T18:19:52-04:00</lastmod>
+        <lastmod>2013-08-07T13:44:06-04:00</lastmod>
     </url>
     <url>
         <loc>http://objectcraftworks.github.io/articles/dotnet/</loc>
@@ -57,6 +51,14 @@
     <url>
         <loc>http://objectcraftworks.github.io/articles/dotnet/nuget/using-dialog/</loc>
         <lastmod>2013-08-04T21:43:54-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://objectcraftworks.github.io/articles/javascript/</loc>
+        <lastmod>2013-08-07T22:43:12-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://objectcraftworks.github.io/articles/javascript/nodejs/assert/throws/</loc>
+        <lastmod>2013-08-07T22:42:22-04:00</lastmod>
     </url>
     <url>
         <loc>http://objectcraftworks.github.io/blog/archives/</loc>
