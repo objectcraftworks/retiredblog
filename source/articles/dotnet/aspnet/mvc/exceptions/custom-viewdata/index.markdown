@@ -3,7 +3,7 @@ layout: page
 title: "ASP.NET/MVC Exception Handling Part 4: ViewDataProvider for Error View"
 comments: true
 ---
- As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View. Also, We have seen in [part2](/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling) and [part3](/blog/2013/07/23/custom-model-for-errorview), how we can extend the default exception filter to keep the viewdata items set by controller and to use a custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use the techniques covered so far.
+ As we have seen so far in this multi part article, the framework creates a ViewData with a model of type HandleErrorInfo and assigns this ViewData object to View. Also, We have seen in [part2](/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling) and [part3](/blog/2013/07/23/custom-model-for-errorview), how we can extend the default exception filter to keep the viewdata items set by the controller and to use a custom model.  In this part,  we will see how we can extend the default filter to set the view data. We will use the techniques covered so far.
  
  <!-- more -->
  
@@ -18,7 +18,7 @@ You can either directly access these items as you would in a dictionary, or use 
                                ViewDataProvider=typeof(ErrorViewDataProvider))]
 ```
 
-  Now, we need to define a contract for ViewDataProvider. 
+  Now, we need to define a contract for the ViewDataProvider. 
 As Filter has in its hand: ErrorContext, and the default model it creates. Lets make them available to our custom view data provider. Let's define the signature,as shown below.
 
 ``` csharp contract 
@@ -70,7 +70,7 @@ public class ErrorViewDataProvider : IErrorViewDataProvider
     }
 }
 ```
-Now that we have a viewdata provider, let's extend the default filter to use this this provider. 
+Now that we have a viewdata provider, let's extend the default filter to use this provider. 
 
 ``` csharp HandleErrorWithCustomViewDataAttribute.cs 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]

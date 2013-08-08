@@ -10,7 +10,7 @@ footer: true
 
 ## Exceptions
  
-  It's annoying to users when an application displays uncaught generic exceptions. Most common are accessing a null object. If it's happening in client side in a javascript code, first it annoys users, and second, we, developers don't have any idea of that error.  So it's worth to take time to handle these scenarios, and display user friendly messages.
+  It's annoying to users when an application displays uncaught generic exceptions. Most common are accessing a null object. If it's happening in the client side in a javascript code, first it annoys users, and second, we, developers don't have any idea of that error.  So it's worth to take time to handle these scenarios, and display user friendly messages.
  
   Work is not complete until the code is error safe. If you are a defensive programmer, you would want to handle all possible scenarios, so that your code does not throw generic exceptions.  
 
@@ -59,7 +59,7 @@ The file should now look like
   divide(2,2);
   divide(2,0);
 ```
-    Let's run this file now in the node, and you should get a error as show below.
+    Let's run this file now in the node, and you should get an error as shown below.
 
  {%img /images/articles/javascript/nodejs/using-assert/divide_by_zero.png %}
 
@@ -112,7 +112,7 @@ Let's run this file in the node. Now it should run successfully.
  
  {%img /images/articles/javascript/nodejs/using-assert/divide_by_zero.png %}
 
-  When you pass divide(2,0) directly to assert.throws, what assert.throws receives is a return value of the function. By then, the call threw the error.
+  When you pass divide(2,0) directly to assert.throws, what assert.throws receives is a return value of the function. By then, the call has already been executed with an exception.
 So that's why, the function under test should be wrapped to use it in ```assert.throws```.
 
   We have seen how we can use ```assert.throws``` to expect an exception in a test scenario.

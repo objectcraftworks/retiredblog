@@ -9,6 +9,7 @@ footer: true
 ## NuGet
  
 ##### [Managing Packages using NuGet Dialog](nuget/using-dialog)
+  
   A tutorial on how to use the Nuget Dialog to add, remove, and update packages.
 It also covers how to manage packages for a visual studio solution. 
 
@@ -16,7 +17,7 @@ It also covers how to manage packages for a visual studio solution.
 ##### [Managing Packages using the Package Manager Console](nuget/using-console)   
   A tutorial on how to use Powershell Console to add, remove, and update packages.
 It also covers how to manage packages for a solution. 
-You will also see how to add or a update a particular version of a package using PM Console.
+You will also see how to add or update a particular version of a package using PM Console.
 
 
 ## ASP.NET/MVC

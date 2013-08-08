@@ -38,7 +38,7 @@ When you create a MVC project, it does two things for error handling purpose
         1. Creates an error view in shared folder (/Views/Shared/Error.cshtml)
         2. Adds HandleError filter to Global filters (/AppStart/FilterConfig.cs) 
 
-Let's first see the contents of the Error view. You would notice ```@model``` set to HandleErrorInfo. The Framework passes HandleErrorInfo to the view.
+First, Let's see the contents of the Error view. You would notice ```@model``` set to HandleErrorInfo. The Framework passes HandleErrorInfo to the view.
 
 ``` html Views/Shared/Error.cshtml 
     
@@ -137,7 +137,7 @@ HandleErrorInfo has properties for the  Exception that is being handled, and nam
 #### Global filters 
  The framework defines scope and order for how the filters are called.
 Global scope is last in the order, but gets called for every action.
-That's why framework adds the HandleError filter to the Global Filter collection. It doesnot stop you add the filter at action or controller levels.
+That's why framework adds the HandleError filter to the Global Filter collection. It doesnot stop you to add the filter at action or at controller levels.
 
 #### Error View
  The framework generates very basic view. It has access to HandleErrorInfo. Using the model, you can get Exception that is being handled, and the action/controller that caused the exception. 
