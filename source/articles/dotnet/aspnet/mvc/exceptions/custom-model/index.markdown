@@ -148,3 +148,14 @@ if you run the application now, you should see Custom Error View with custom mod
 {% img /images/posts/aspdotnetmvc/error_custom_model.png %}
 
   In this part, we have seen how to extend the default exception filter to use a custom model for an error view.
+
+
+st Updated: 08/07/2013
+
+#### Related Articles:
+
+##### Default exception handling works in [Part 1](/articles/dotnet/aspnet/mvc/exceptions/explained)
+##### To keep the view data items set by the controllers for Error Views in [Part 2](/articles/dotnet/aspnet/mvc/exceptions/keep-viewdata)                      
+#####  To set custom ViewData for ErrorViews in [Part 4](/articles/dotnet/aspnet/mvc/exceptions/custom-viewdata). 
+
+

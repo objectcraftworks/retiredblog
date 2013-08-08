@@ -126,4 +126,15 @@ We have seen how we can use filters to extend the ASP.NET/MVC framework and hand
  * In Part2, We extended default error filter to pass the View Data items set by a controller to Error View
  * In Part3, We wrote an exception filter by extending the default filter to use Custom model and set the model for the error view.
  * In Part4, We extended what learned so far, and provided a way to set the custom view data provider for the error view.
-   
+  
+---
+Last Updated: 08/07/2013
+
+#### Related Articles:
+
+##### Default exception handling works in [Part 1](/articles/dotnet/aspnet/mvc/exceptions/explained)
+##### To keep the view data items set by the controllers for Error Views in [Part 2](/articles/dotnet/aspnet/mvc/exceptions/keep-viewdata)                      
+##### To use a custom model for an error view in [Part 3](/articles/dotnet/aspnet/mvc/exceptions/custom-model).
+
+
+ 

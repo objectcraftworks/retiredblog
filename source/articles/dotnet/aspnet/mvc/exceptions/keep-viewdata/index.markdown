@@ -119,3 +119,14 @@ You can get the full listing for the filter from Github.
 {% gist 6065646 HandleErrorWithViewDataAttribute.cs %}
 
  In this part, We have extended the HandleError filter to set the viewdata keys on the ViewResult. This enabled us to use a master/layout for an error view.
+
+---
+Last Updated: 08/07/2013
+
+#### Related Articles:
+
+##### Default exception handling works in [Part 1](/articles/dotnet/aspnet/mvc/exceptions/explained)
+##### To use a custom model for an error view in [Part 3](/articles/dotnet/aspnet/mvc/exceptions/custom-model).
+#####  To set custom ViewData for ErrorViews in [Part 4](/articles/dotnet/aspnet/mvc/exceptions/custom-viewdata). 
+
+

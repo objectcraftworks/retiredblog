@@ -148,3 +148,15 @@ That's why framework adds the HandleError filter to the Global Filter collection
     HandleErrorInfo model for Error View
     Global Filters to handle exceptions globally
     An error view 
+
+---
+Last Updated: 08/07/2013
+
+#### Related Articles:
+##### To keep the view data items set by the controllers for Error Views in [Part 2](/articles/dotnet/aspnet/mvc/exceptions/keep-viewdata) 
+##### To use a custom model for an error view in [Part 3](/articles/dotnet/aspnet/mvc/exceptions/custom-model).
+#####  To set custom ViewData for ErrorViews in [Part 4](/articles/dotnet/aspnet/mvc/exceptions/custom-viewdata). 
+
+
+
+
