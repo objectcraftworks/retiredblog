@@ -81,9 +81,9 @@
   </header>
   
   <p>   In <a href="/blog/2013/07/18/asp-dot-net-exception-handling-explained">Part1</a> of this article, we covered default exception handling of the ASP.NET/MVC framework.
-   In this part, We will see how to keep the view data set by the controller for error view and master/layout.</p>
+   In this part, We will see how to keep the view data set by the controller for an Error View and master/layout.</p>
 
-<p>If you want your Error View use a master that uses ViewData/ViewBag, You will have to set it again in Error View, which will be a duplicate code.</p>
+<p>If you want your Error View use a master that uses ViewData/ViewBag, You will have to set it again in an Error View, which will be a duplicate code.</p>
 
 <p> Let&rsquo;s see how we can display the temperature in every page.
  To display the temperature in every page, we will have to add to a layout as shown below.</p>
@@ -98,7 +98,7 @@
 <p> <!-- more -->
 Then, we will have to set the <code>ViewBag.Temperature</code> somewhere.
 There are multiple ways you can set ViewData for master layouts.
-You can set using a base controller, or in an action/result filter, or in actions. We will set it in an action for this example(for production code, this is not a good practice as you will have set this data in every action).</p>
+You can set using a base controller, or in an action/result filter, or in actions. We will set it in an action for this example(for production code, this is not a good practice as you will have to set this data in every action).</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -128,13 +128,13 @@ You can set using a base controller, or in an action/result filter, or in action
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The temperature wouldn&rsquo;t be displayed and would be just &deg; in the error view.</p>
+<p>The temperature wouldn&rsquo;t be displayed and would be just &deg; in the Error View.</p>
 
 <p>What happened?!</p>
 
-<p> The MVC framework doesn&rsquo;t keep the viewdata/viewbag set by the controllers. When the framework creates the error view, it just creates the ViewData object and sets the model.That&rsquo;s why <code>ViewBag.Temperature</code> is null.</p>
+<p> The MVC framework doesn&rsquo;t keep the viewdata/viewbag set by the controllers. When the framework creates the Error View, it just creates the ViewData object and sets the model.That&rsquo;s why <code>ViewBag.Temperature</code> is null.</p>
 
-<p>Now, let&rsquo;s see how we could solve this problem. We could set the temperature again in Error View. But that will be a duplicate code. We don&rsquo;t want to do that.</p>
+<p>Now, let&rsquo;s see how we could solve this problem. We could set the temperature again in an Error View. But that will be a duplicate code. We don&rsquo;t want to do that.</p>
 
 <p>Instead of setting it again, we could retain the Controller ViewData/ViewBag, and set on the View even in the event of exception as shown below.</p>
 
@@ -164,7 +164,7 @@ To make sure Error View is getting the model, let&rsquo;s go ahead use the model
 
 
 <p>
- and throw an exception in Index action of HomeController. If you run the application now, you should see a message.</p>
+ and throw an exception in Index action of the HomeController. If you run the application now, you should see a message.</p>
 
 <p>Now that we have something to tell us that we didn&rsquo;t break any thing. Let&rsquo;s go ahead extend the HandleError filter.</p>
 
@@ -191,7 +191,7 @@ To make sure Error View is getting the model, let&rsquo;s go ahead use the model
 
 
 <p>
-Let&rsquo;s call our code that sets ViewData on ViewResult. We will have to cast Result to ViewResult type.</p>
+Let&rsquo;s call our code that sets the ViewData on ViewResult. We will have to cast Result to ViewResult type.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -200,10 +200,10 @@ Let&rsquo;s call our code that sets ViewData on ViewResult. We will have to cast
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now, let&rsquo;s run the application to test our code. We are expecting to have an error view with the message and the temperature. But you will get a Yellow screen error page.</p>
+<p>Now, let&rsquo;s run the application to test our code. We are expecting to have an Error View with the message and the temperature. But you will get a Yellow screen error page.</p>
 
 <p>What happened?!
-If you debug the application, you will see that model in the error view is null.</p>
+If you debug the application, you will see that model in the Error View is null.</p>
 
 <p>So when we set <code>result.ViewData = filterContext.Controller.ViewData;</code> , we are overriding the ViewData and the model set by the base class HandleError. That should explain why Error didn&rsquo;t receive model.</p>
 
@@ -270,7 +270,7 @@ namespace ObjectCraftworks
 }</code></pre></noscript></div>
 
 
-<p> In this part, We have extended the HandleError filter to set the viewdata keys on the ViewResult. This enabled us to use a master/layout for an error view.</p>
+<p> In this part, We have extended the HandleError filter to set the viewdata keys on the ViewResult. This enabled us to use a master/layout for an Error View.</p>
 
 <hr />
 
@@ -280,9 +280,9 @@ namespace ObjectCraftworks
 
 <h5>Default exception handling works in <a href="/articles/dotnet/aspnet/mvc/exceptions/explained">Part 1</a></h5>
 
-<h5>To use a custom model for an error view in <a href="/articles/dotnet/aspnet/mvc/exceptions/custom-model">Part 3</a>.</h5>
+<h5>To use a custom model for an Error View in <a href="/articles/dotnet/aspnet/mvc/exceptions/custom-model">Part 3</a>.</h5>
 
-<h5>To set custom ViewData for ErrorViews in <a href="/articles/dotnet/aspnet/mvc/exceptions/custom-viewdata">Part 4</a>.</h5>
+<h5>To set custom ViewData for Error Views in <a href="/articles/dotnet/aspnet/mvc/exceptions/custom-viewdata">Part 4</a>.</h5>
 
   
     <footer>

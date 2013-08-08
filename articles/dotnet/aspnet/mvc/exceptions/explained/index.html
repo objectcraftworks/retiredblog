@@ -121,7 +121,7 @@ The framework default exception handling doesn&rsquo;t handle these two situatio
     2. Adds HandleError filter to Global filters (/AppStart/FilterConfig.cs) 
 </code></pre>
 
-<p>Let&rsquo;s first see the contents of the Error view. You would notice <code>@model</code> set to HandleErrorInfo. The Framework passes HandleErrorInfo to the view.</p>
+<p>First, Let&rsquo;s see the contents of the Error view. You would notice <code>@model</code> set to HandleErrorInfo. The Framework passes HandleErrorInfo to the view.</p>
 
 <figure class='code'><figcaption><span>Views/Shared/Error.cshtml </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -266,7 +266,7 @@ HandleErrorInfo has properties for the  Exception that is being handled, and nam
 
 <p> The framework defines scope and order for how the filters are called.
 Global scope is last in the order, but gets called for every action.
-That&rsquo;s why framework adds the HandleError filter to the Global Filter collection. It doesnot stop you add the filter at action or controller levels.</p>
+That&rsquo;s why framework adds the HandleError filter to the Global Filter collection. It doesnot stop you to add the filter at action or at controller levels.</p>
 
 <h4>Error View</h4>
 

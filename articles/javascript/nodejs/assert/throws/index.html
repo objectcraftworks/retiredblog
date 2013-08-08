@@ -84,7 +84,7 @@
 
 <h2>Exceptions</h2>
 
-<p>  It&rsquo;s annoying to users when an application displays uncaught generic exceptions. Most common are accessing a null object. If it&rsquo;s happening in client side in a javascript code, first it annoys users, and second, we, developers don&rsquo;t have any idea of that error.  So it&rsquo;s worth to take time to handle these scenarios, and display user friendly messages.</p>
+<p>  It&rsquo;s annoying to users when an application displays uncaught generic exceptions. Most common are accessing a null object. If it&rsquo;s happening in the client side in a javascript code, first it annoys users, and second, we, developers don&rsquo;t have any idea of that error.  So it&rsquo;s worth to take time to handle these scenarios, and display user friendly messages.</p>
 
 <p>  Work is not complete until the code is error safe. If you are a defensive programmer, you would want to handle all possible scenarios, so that your code does not throw generic exceptions.</p>
 
@@ -159,7 +159,7 @@ The file should now look like</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<pre><code>Let's run this file now in the node, and you should get a error as show below.
+<pre><code>Let's run this file now in the node, and you should get an error as shown below.
 </code></pre>
 
 <p> <img src="/images/articles/javascript/nodejs/using-assert/divide_by_zero.png"></p>
@@ -231,7 +231,7 @@ Then, the file should look</p>
 
 <p> <img src="/images/articles/javascript/nodejs/using-assert/divide_by_zero.png"></p>
 
-<p>  When you pass divide(2,0) directly to assert.throws, what assert.throws receives is a return value of the function. By then, the call threw the error.
+<p>  When you pass divide(2,0) directly to assert.throws, what assert.throws receives is a return value of the function. By then, the call has already been executed with an exception.
 So that&rsquo;s why, the function under test should be wrapped to use it in <code>assert.throws</code>.</p>
 
 <p>  We have seen how we can use <code>assert.throws</code> to expect an exception in a test scenario.</p>

@@ -81,7 +81,7 @@
   </header>
   
   <p>In <a href="/blog/2013/07/18/asp-dot-net-exception-handling-explained">Part1</a> of this article, we covered default exception handling of the ASP.NET/MVC framework.
-<a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">Part2</a> covered how to keep the view data set by the controller for error view and master/layout.
+<a href="/blog/2013/07/18/asp-dot-net-mvc4-global-error-handling/">Part2</a> covered how to keep the view data set by the controller for an Error View and master/layout.
  In this part, we will cover how to use a custom model.</p>
 
 <p>   With default exception handling mechanism of the framework, you are stuck with the model framework supplies. When an exception is caught by the framework, It creates an object of the type <code>HandleErrorInfo</code>
@@ -91,7 +91,7 @@ and passes to the Error View.
 <p>We will see how to provide an hook to extend the model.</p>
 
 <p> <!-- more -->
-Let&rsquo;s do this with our example of displaying customer contact information based on the context. This context could vary on things such customer location, type of error, or customer serving system, tech support etc.
+Let&rsquo;s do this with our example of displaying customer contact information based on the context. This context could vary on things such as customer location, type of error, or customer serving system, tech support etc.
 Let&rsquo;s define a model for this.</p>
 
 <figure class='code'><figcaption><span>CustomModel </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -146,9 +146,9 @@ We would</p>
 <p>
   That&rsquo;s a clean separation of concerns, of course the beauty of this code structure is coming from MVC pattern.</p>
 
-<p>  We would expect same thing happening even for Error Views. But that&rsquo;s not the case. The framework handles error views differently. It sets the model and doesn&rsquo;t carry the ViewData set in Controller/Actions.</p>
+<p>  We would expect the same thing happening even for Error Views. But that&rsquo;s not the case. The framework handles an Error Views differently. It sets the model and doesn&rsquo;t carry the ViewData set in Controller/Actions.</p>
 
-<p>   We have only one option to implement this. We will have to put the logic of loading the model in the error page it self. That fixes the problem, but it&rsquo;s not clear separation of concerns.</p>
+<p>   We have only one option to implement this. We will have to put the logic of loading the model in the error page itself. That fixes the problem, but it&rsquo;s not a clear separation of concerns.</p>
 
 <p>   What we need to solve this problem correctly is a way to the framework use our model instead of default model HandlerErrorInfo.
  if we define model for our customer support information,
@@ -167,7 +167,7 @@ We would</p>
 <p></p>
 
 <p>It turns out that we can this by extending HandleError filter.
-   HandleError allows you specify error(default is Error.cshtml) or master/layout for your error view. Here is how you can specify different error, and layout.</p>
+   HandleError allows you specify an error(default is Error.cshtml) or master/layout for your an Error View. Here is how you can specify different error, and layout.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">[HandleError(Master=&quot;_ErrorLayout&quot;, View=&quot;ErrorWithCustomModel&quot;)]</span>
@@ -179,14 +179,14 @@ We would</p>
 
 <p> We can add something to this filter to allow us to specify a custom model.
 The filter should call our code that loads the data and sets the model on view.
-We are essentially providing a model to the framework. So we can add a new property to filter, we can call it ModelProvider.</p>
+We are essentially providing a model to the framework. So we can add a new property to the filter, we can call it as ModelProvider.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='csharp'><span class='line'><span class="na">[HandleErrorWithCustomModel(View=&quot;ErrorWithCustomModel&quot;, ModelProvider=typeof(ErrorModelProvider))]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  Now we need define a contract for ModelProvider.
+<p>  Now we need to define a contract for ModelProvider.
 As Filter has two items it can pass to this model provider: ErrorContext, and the default model it creates. Let&rsquo;s define the signature</p>
 
 <figure class='code'><figcaption><span>contract </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -293,11 +293,11 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>if you run the application now, you should see Custom Error View with custom model, displaying ContactNo correctly from model.</p>
+<p>if you run the application now, you should see the contact number pulling from the custom model.</p>
 
 <p><img src="/images/posts/aspdotnetmvc/error_custom_model.png"></p>
 
-<p>  In this part, we have seen how to extend the default exception filter to use a custom model for an error view.</p>
+<p>  In this part, we have seen how to extend the default exception filter to use a custom model for an Error View.</p>
 
 <p>st Updated: 08/07/2013</p>
 
@@ -305,7 +305,7 @@ As Filter has two items it can pass to this model provider: ErrorContext, and th
 
 <h5>Default exception handling works in <a href="/articles/dotnet/aspnet/mvc/exceptions/explained">Part 1</a></h5>
 
-<h5>To keep the view data items set by the controllers for Error Views in <a href="/articles/dotnet/aspnet/mvc/exceptions/keep-viewdata">Part 2</a></h5>
+<h5>To keep the view data items set by the controllers for the Error Views in <a href="/articles/dotnet/aspnet/mvc/exceptions/keep-viewdata">Part 2</a></h5>
 
 <h5>To set custom ViewData for ErrorViews in <a href="/articles/dotnet/aspnet/mvc/exceptions/custom-viewdata">Part 4</a>.</h5>
 
